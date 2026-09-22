@@ -16,15 +16,19 @@ export default async function GiaoAnListPage(
     where: q
       ? {
           OR: [
-            { tenBai: { contains: q } },
+            { tenBai: { contains: q, mode: "insensitive" } },
             {
               buoiDay: {
-                lichTrinh: { monHoc: { tenMonHoc: { contains: q } } },
+                lichTrinh: {
+                  monHoc: { tenMonHoc: { contains: q, mode: "insensitive" } },
+                },
               },
             },
             {
               buoiDay: {
-                lichTrinh: { lop: { tenLop: { contains: q } } },
+                lichTrinh: {
+                  lop: { tenLop: { contains: q, mode: "insensitive" } },
+                },
               },
             },
           ],

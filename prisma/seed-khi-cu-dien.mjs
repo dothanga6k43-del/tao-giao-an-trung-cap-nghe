@@ -1,10 +1,11 @@
 // Du lieu mau that: mon "KHI CU DIEN" (MH11), lay tu chuong trinh mon hoc,
 // lich trinh giang day va giao vien ban cung cap.
 // Chay: node prisma/seed-khi-cu-dien.mjs
+import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { PrismaPg } from "@prisma/adapter-pg";
 
-const adapter = new PrismaBetterSqlite3({ url: process.env.DATABASE_URL ?? "file:./dev.db" });
+const adapter = new PrismaPg(process.env.DATABASE_URL);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
