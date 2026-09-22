@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Soạn giáo án Trung cấp nghề
 
-## Getting Started
+Ứng dụng web hỗ trợ quy trình soạn giáo án cho giáo viên trung cấp nghề:
 
-First, run the development server:
+1. **Chương trình môn học** — nhập môn học, các bài học và nội dung chi tiết
+   phân cấp; tự gán số giờ (tiết) cho từng đề mục.
+2. **Lịch trình giảng dạy** — khai báo khung tiết theo thời khóa biểu (thứ
+   nào có bao nhiêu tiết), số phút/tiết, ngày bắt đầu và ngày nghỉ. Hệ
+   thống tự động xếp các đề mục đã gán thời gian vào từng buổi dạy, cho
+   phép chỉnh sửa (ngày, thiết bị, ghi chú) rồi **duyệt**.
+3. **Giáo án** — sau khi lịch trình được duyệt, AI (Claude) soạn giáo án
+   trình giảng cho từng buổi theo đúng khung mẫu TCN (Dẫn nhập, Giới thiệu
+   chủ đề, Giải quyết vấn đề, Kết thúc vấn đề, Hướng dẫn tự học). Có thể
+   chỉnh sửa tay, đánh dấu hoàn thiện và **xuất ra file Word (.docx)**.
+
+## Công nghệ
+
+- [Next.js 16](https://nextjs.org) (App Router, Server Actions, Turbopack)
+- [Prisma 7](https://www.prisma.io) + SQLite (qua driver adapter
+  `@prisma/adapter-better-sqlite3`) — dễ đổi sang PostgreSQL khi cần nhiều
+  người dùng đồng thời
+- [Anthropic SDK](https://www.npmjs.com/package/@anthropic-ai/sdk) (Claude)
+  để soạn nội dung giáo án
+- [docx](https://www.npmjs.com/package/docx) để xuất file Word
+
+## Cài đặt & chạy thử
 
 ```bash
+npm install
+npx prisma migrate deploy   # hoặc: npx prisma migrate dev
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Mở http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Biến môi trường
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Sao chép `.env.example` thành `.env` và điền:
 
-## Learn More
+```
+DATABASE_URL="file:./dev.db"
+ANTHROPIC_API_KEY="sk-ant-..."   # bắt buộc để dùng tính năng "Soạn giáo án bằng AI"
+```
 
-To learn more about Next.js, take a look at the following resources:
+Không có `ANTHROPIC_API_KEY`, toàn bộ ứng dụng vẫn hoạt động bình thường
+(chương trình môn học, lịch trình giảng dạy, xuất Word) — chỉ riêng nút
+"Soạn giáo án bằng AI" / "Soạn lại bằng AI" sẽ báo lỗi.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Quy ước dữ liệu quan trọng
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **1 giờ trong chương trình môn học = 1 tiết trong thời khóa biểu.**
+  Số phút thực tế của 1 tiết được cấu hình riêng cho từng lịch trình giảng
+  dạy (mặc định 45 phút).
+- Trong "Nội dung chi tiết" của một bài, chỉ những đề mục **có gán thời
+  gian** mới được xếp vào lịch trình. Một đề mục cha có mục con thì thời
+  gian nằm ở các mục con (mục cha chỉ là tiêu đề nhóm).
+- Thuật toán xếp lịch trình (`src/lib/lichtrinh/generate.ts`) dồn các đề
+  mục theo đúng thứ tự trong chương trình vào các buổi dạy theo khung tiết
+  tuần đã khai báo, tách "(Tiếp)" khi một đề mục kéo dài qua nhiều buổi, và
+  bỏ qua các ngày nghỉ.
+- Sau khi lịch trình được **duyệt**, không thể sinh lại hoặc sửa ngày/nội
+  dung các buổi (phải "Mở duyệt lại" trước).
 
-## Deploy on Vercel
+## Cấu trúc thư mục chính
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+prisma/schema.prisma        Mô hình dữ liệu
+src/lib/lichtrinh/generate.ts   Thuật toán xếp lịch trình (hàm thuần, có thể test độc lập)
+src/lib/giaoan/generate.ts      Gọi Claude API để soạn giáo án
+src/lib/actions/*.ts             Server Actions (mutate dữ liệu qua form)
+src/app/*                        Các trang (App Router)
+```
