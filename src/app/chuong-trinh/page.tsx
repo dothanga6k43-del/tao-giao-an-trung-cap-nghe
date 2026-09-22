@@ -16,12 +16,20 @@ export default async function ChuongTrinhListPage() {
             Quản lý chương trình môn học, nội dung tổng quát và nội dung chi tiết.
           </p>
         </div>
-        <Link
-          href="/chuong-trinh/moi"
-          className="rounded-md bg-slate-900 text-white px-4 py-2 text-sm font-medium hover:bg-slate-700"
-        >
-          + Thêm môn học
-        </Link>
+        <div className="flex gap-3">
+          <Link
+            href="/chuong-trinh/nhap-file"
+            className="rounded-md border border-slate-300 text-slate-700 px-4 py-2 text-sm font-medium hover:bg-slate-50"
+          >
+            Nhập từ file Word
+          </Link>
+          <Link
+            href="/chuong-trinh/moi"
+            className="rounded-md bg-slate-900 text-white px-4 py-2 text-sm font-medium hover:bg-slate-700"
+          >
+            + Thêm môn học
+          </Link>
+        </div>
       </div>
 
       <div className="bg-white border border-slate-200 rounded-lg divide-y divide-slate-100">
