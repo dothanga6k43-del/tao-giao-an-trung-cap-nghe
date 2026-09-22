@@ -1,0 +1,12 @@
+node_modules/
+.next/
+.next-profiles/
+dev.db
+dev.db-journal
+*.db
+*.db-journal
+.env
+.env*.local
+npm-debug.log*
+.DS_Store
+next-env.d.ts

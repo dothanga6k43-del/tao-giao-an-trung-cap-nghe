@@ -1,0 +1,200 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum LoaiNoiDung {
+  LT // Ly thuyet
+  TH // Thuc hanh
+  KT // Kiem tra
+}
+
+enum TrangThaiLichTrinh {
+  DRAFT
+  APPROVED
+}
+
+enum TrangThaiGiaoAn {
+  DRAFT
+  FINAL
+}
+
+model GiaoVien {
+  id            String   @id @default(cuid())
+  hoTen         String
+  soDienThoai   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  monHoc        MonHoc[]
+  lichTrinh     LichTrinhGiangDay[]
+}
+
+model Lop {
+  id            String   @id @default(cuid())
+  tenLop        String
+  khoa          String?
+  namThu        Int?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  lichTrinh     LichTrinhGiangDay[]
+}
+
+// Chuong trinh mon hoc
+model MonHoc {
+  id                String   @id @default(cuid())
+  tenMonHoc         String
+  maMonHoc          String?
+  tongSoGio         Float
+  lyThuyetGio       Float
+  thucHanhGio       Float
+  kiemTraGio        Float
+  viTriTinhChat     String?
+  mucTieu           String? // markdown/plain text, muc tieu chung cua mon hoc
+  dieuKienThucHien  String?
+  phuongPhapDanhGia String?
+  taiLieuThamKhao   String?
+  giaoVienId        String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  giaoVien          GiaoVien? @relation(fields: [giaoVienId], references: [id])
+  baiHoc            BaiHoc[]
+  lichTrinh         LichTrinhGiangDay[]
+}
+
+// Mot "Bai" trong chuong trinh (chuong/bai theo bang tong quat)
+model BaiHoc {
+  id            String   @id @default(cuid())
+  monHocId      String
+  thuTu         Int
+  tenBai        String
+  tongSoGio     Float
+  lyThuyetGio   Float
+  thucHanhGio   Float
+  kiemTraGio    Float
+  mucTieu       String? // muc tieu rieng cua bai
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  monHoc        MonHoc   @relation(fields: [monHocId], references: [id], onDelete: Cascade)
+  noiDungMuc    NoiDungMuc[]
+}
+
+// De muc phan cap trong "Noi dung chi tiet" cua mot Bai (vd 1., 1.1., 1.2 ...)
+model NoiDungMuc {
+  id            String   @id @default(cuid())
+  baiHocId      String
+  parentId      String?
+  thuTu         Int
+  tieuDe        String
+  loai          LoaiNoiDung @default(LT)
+  thoiGianTiet  Float?   // so gio/tiet nguoi dung gan cho de muc nay (chi can o muc la/leaf)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  baiHoc        BaiHoc   @relation(fields: [baiHocId], references: [id], onDelete: Cascade)
+  parent        NoiDungMuc? @relation("NoiDungMucChildren", fields: [parentId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  children      NoiDungMuc[] @relation("NoiDungMucChildren")
+  buoiDayNoiDung BuoiDayNoiDung[]
+}
+
+// Lich trinh giang day (mot "offering" mon hoc cho 1 lop)
+model LichTrinhGiangDay {
+  id              String   @id @default(cuid())
+  lopId           String
+  monHocId        String
+  giaoVienId      String?
+  hocKy           String?
+  ngayBatDau      DateTime // ngay bat dau xep lich, dung de sinh Ngay thuc hien
+  soPhutMoiTiet   Int      @default(45)
+  trangThai       TrangThaiLichTrinh @default(DRAFT)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  lop             Lop      @relation(fields: [lopId], references: [id])
+  monHoc          MonHoc   @relation(fields: [monHocId], references: [id])
+  giaoVien        GiaoVien? @relation(fields: [giaoVienId], references: [id])
+  khungTietTuan   KhungTietTuan[]
+  ngayNghi        NgayNghi[]
+  buoiDay         BuoiDay[]
+}
+
+// Khung tiet theo thu trong tuan, rieng cho 1 lich trinh (tu thoi khoa bieu)
+model KhungTietTuan {
+  id                  String   @id @default(cuid())
+  lichTrinhId         String
+  thu                 Int      // 2 = Thu Hai ... 7 = Thu Bay, 8 = Chu Nhat
+  tietBatDau          Int
+  soTiet              Int
+  diaDiem             String?
+
+  lichTrinh           LichTrinhGiangDay @relation(fields: [lichTrinhId], references: [id], onDelete: Cascade)
+}
+
+// Ngay nghi/khong day, rieng cho 1 lich trinh
+model NgayNghi {
+  id            String   @id @default(cuid())
+  lichTrinhId   String
+  ngay          DateTime
+  ghiChu        String?
+
+  lichTrinh     LichTrinhGiangDay @relation(fields: [lichTrinhId], references: [id], onDelete: Cascade)
+}
+
+// Mot dong/buoi day trong lich trinh giang day
+model BuoiDay {
+  id              String   @id @default(cuid())
+  lichTrinhId     String
+  thuTu           Int
+  ngayThucHien    DateTime
+  tietBatDau      Int
+  tongTiet        Float
+  lyThuyetTiet    Float    @default(0)
+  thucHanhTiet    Float    @default(0)
+  baiTapTiet      Float    @default(0)
+  kiemTraTiet     Float    @default(0)
+  thietBi         String?
+  ghiChu          String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  lichTrinh       LichTrinhGiangDay @relation(fields: [lichTrinhId], references: [id], onDelete: Cascade)
+  noiDung         BuoiDayNoiDung[]
+  giaoAn          GiaoAn?
+}
+
+// Noi dung chi tiet (NoiDungMuc) duoc phan bo vao 1 buoi day, voi so tiet cua phan do trong buoi
+model BuoiDayNoiDung {
+  id              String   @id @default(cuid())
+  buoiDayId       String
+  noiDungMucId    String
+  thuTu           Int
+  soTiet          Float
+  laTiepTuc       Boolean  @default(false) // danh dau "(Tiep)" neu bai da xuat hien o buoi truoc
+
+  buoiDay         BuoiDay  @relation(fields: [buoiDayId], references: [id], onDelete: Cascade)
+  noiDungMuc      NoiDungMuc @relation(fields: [noiDungMucId], references: [id])
+}
+
+// Giao an trinh giang cho 1 buoi day
+model GiaoAn {
+  id                String   @id @default(cuid())
+  buoiDayId         String   @unique
+  tenBai            String
+  kienThuc          String?
+  kyNang            String?
+  nangLucTuChu      String?
+  doDungThietBi     String?
+  hinhThucToChuc    String?
+  noiDungJson       String   // JSON: { danNhap, gioiThieuChuDe, giaiQuyetVanDe[], ketThucVanDe, huongDanTuHoc }
+  trangThai         TrangThaiGiaoAn @default(DRAFT)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  buoiDay           BuoiDay  @relation(fields: [buoiDayId], references: [id], onDelete: Cascade)
+}
