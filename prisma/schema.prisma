@@ -98,7 +98,7 @@ model NoiDungMuc {
   updatedAt     DateTime @updatedAt
 
   baiHoc        BaiHoc   @relation(fields: [baiHocId], references: [id], onDelete: Cascade)
-  parent        NoiDungMuc? @relation("NoiDungMucChildren", fields: [parentId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  parent        NoiDungMuc? @relation("NoiDungMucChildren", fields: [parentId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   children      NoiDungMuc[] @relation("NoiDungMucChildren")
   buoiDayNoiDung BuoiDayNoiDung[]
 }

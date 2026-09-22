@@ -11,6 +11,7 @@ import {
   moDuyetLaiLichTrinh,
   xoaLichTrinh,
 } from "@/lib/actions/lich-trinh";
+import { taoGiaoAnBangAI } from "@/lib/actions/giao-an";
 
 const THU_LABEL: Record<number, string> = {
   2: "Thứ 2",
@@ -214,13 +215,22 @@ export default async function LichTrinhDetailPage(
                         </p>
                       ))}
                     </div>
-                    {b.giaoAn && (
+                    {b.giaoAn ? (
                       <Link
                         href={`/giao-an/${b.giaoAn.id}`}
                         className="inline-block mt-2 text-sm text-blue-600 hover:underline"
                       >
                         Xem giáo án →
                       </Link>
+                    ) : (
+                      daDuyet && (
+                        <form action={taoGiaoAnBangAI} className="mt-2">
+                          <input type="hidden" name="buoiDayId" value={b.id} />
+                          <button className="text-sm rounded-md bg-blue-600 text-white px-3 py-1.5 hover:bg-blue-500">
+                            Soạn giáo án bằng AI
+                          </button>
+                        </form>
+                      )
                     )}
                   </div>
 
