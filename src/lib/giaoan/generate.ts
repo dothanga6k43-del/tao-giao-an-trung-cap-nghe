@@ -1,11 +1,20 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { prisma } from "@/lib/prisma";
+import { goiGeminiJson } from "@/lib/gemini";
 import type { NoiDungGiaoAn } from "./schema";
 
-const TEN_CONG_CU = "soan_giao_an";
+const SCHEMA_MUC = {
+  type: "object",
+  properties: {
+    tieuDe: { type: "string" },
+    thoiGianPhut: { type: "number" },
+    hoatDongGV: { type: "string" },
+    hoatDongHS: { type: "string" },
+  },
+  required: ["tieuDe", "thoiGianPhut", "hoatDongGV", "hoatDongHS"],
+};
 
-const SCHEMA_CONG_CU = {
-  type: "object" as const,
+const SCHEMA_KET_QUA = {
+  type: "object",
   properties: {
     kienThuc: { type: "string", description: "Mục tiêu về kiến thức, dạng gạch đầu dòng" },
     kyNang: { type: "string", description: "Mục tiêu về kỹ năng, dạng gạch đầu dòng" },
@@ -18,26 +27,8 @@ const SCHEMA_CONG_CU = {
       description:
         "Hình thức tổ chức dạy học cho từng phần (dẫn nhập, giới thiệu chủ đề, lý thuyết liên quan, trình tự thực hiện, thực hành, kết thúc, hướng dẫn tự học)",
     },
-    danNhap: {
-      type: "object",
-      properties: {
-        tieuDe: { type: "string" },
-        thoiGianPhut: { type: "number" },
-        hoatDongGV: { type: "string" },
-        hoatDongHS: { type: "string" },
-      },
-      required: ["tieuDe", "thoiGianPhut", "hoatDongGV", "hoatDongHS"],
-    },
-    gioiThieuChuDe: {
-      type: "object",
-      properties: {
-        tieuDe: { type: "string" },
-        thoiGianPhut: { type: "number" },
-        hoatDongGV: { type: "string" },
-        hoatDongHS: { type: "string" },
-      },
-      required: ["tieuDe", "thoiGianPhut", "hoatDongGV", "hoatDongHS"],
-    },
+    danNhap: SCHEMA_MUC,
+    gioiThieuChuDe: SCHEMA_MUC,
     giaiQuyetVanDe: {
       type: "array",
       description:
@@ -57,26 +48,8 @@ const SCHEMA_CONG_CU = {
         required: ["tieuDe", "thoiGianPhut", "noiDung", "hoatDongGV", "hoatDongHS"],
       },
     },
-    ketThucVanDe: {
-      type: "object",
-      properties: {
-        tieuDe: { type: "string" },
-        thoiGianPhut: { type: "number" },
-        hoatDongGV: { type: "string" },
-        hoatDongHS: { type: "string" },
-      },
-      required: ["tieuDe", "thoiGianPhut", "hoatDongGV", "hoatDongHS"],
-    },
-    huongDanTuHoc: {
-      type: "object",
-      properties: {
-        tieuDe: { type: "string" },
-        thoiGianPhut: { type: "number" },
-        hoatDongGV: { type: "string" },
-        hoatDongHS: { type: "string" },
-      },
-      required: ["tieuDe", "thoiGianPhut", "hoatDongGV", "hoatDongHS"],
-    },
+    ketThucVanDe: SCHEMA_MUC,
+    huongDanTuHoc: SCHEMA_MUC,
   },
   required: [
     "kienThuc",
@@ -89,6 +62,18 @@ const SCHEMA_CONG_CU = {
     "ketThucVanDe",
     "huongDanTuHoc",
   ],
+};
+
+type KetQuaSoanGiaoAn = {
+  kienThuc: string;
+  kyNang: string;
+  nangLucTuChu: string;
+  hinhThucToChuc: string;
+  danNhap: NoiDungGiaoAn["danNhap"];
+  gioiThieuChuDe: NoiDungGiaoAn["gioiThieuChuDe"];
+  giaiQuyetVanDe: NoiDungGiaoAn["giaiQuyetVanDe"];
+  ketThucVanDe: NoiDungGiaoAn["ketThucVanDe"];
+  huongDanTuHoc: NoiDungGiaoAn["huongDanTuHoc"];
 };
 
 export async function soanGiaoAnBangAI(buoiDayId: string) {
@@ -128,8 +113,6 @@ export async function soanGiaoAnBangAI(buoiDayId: string) {
     })
     .join("\n");
 
-  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-
   const prompt = `Bạn là giáo viên trung cấp nghề đang soạn một "Giáo án trình giảng" cho một buổi dạy, theo đúng mẫu giáo án trình giảng TCN (gồm phần Mục tiêu, Đồ dùng thiết bị, Hình thức tổ chức, và bảng Thực hiện bài học với các mục: Dẫn nhập, Giới thiệu chủ đề, Giải quyết vấn đề (I. Lý thuyết liên quan, II. Trình tự thực hiện, III. Thực hành), Kết thúc vấn đề, Hướng dẫn tự học).
 
 Thông tin buổi dạy:
@@ -149,40 +132,9 @@ Yêu cầu phân bổ thời gian (bắt buộc tuân theo, đơn vị phút):
 - Kết thúc vấn đề: khoảng ${ketThucGoi} phút
 - Hướng dẫn tự học: khoảng ${huongDanGoi} phút
 
-Hãy soạn nội dung bằng tiếng Việt, văn phong sư phạm, cụ thể với nội dung chuyên môn ở trên (không viết chung chung). Gọi công cụ ${TEN_CONG_CU} với đầy đủ dữ liệu.`;
+Hãy soạn nội dung bằng tiếng Việt, văn phong sư phạm, cụ thể với nội dung chuyên môn ở trên (không viết chung chung). Trả về đúng theo schema JSON đã cho, không thêm văn bản nào khác ngoài JSON.`;
 
-  const model = process.env.ANTHROPIC_MODEL || "claude-sonnet-5";
-
-  const message = await client.messages.create({
-    model,
-    max_tokens: 8000,
-    messages: [{ role: "user", content: prompt }],
-    tools: [
-      {
-        name: TEN_CONG_CU,
-        description: "Lưu nội dung giáo án trình giảng đã soạn",
-        input_schema: SCHEMA_CONG_CU,
-      },
-    ],
-    tool_choice: { type: "tool", name: TEN_CONG_CU },
-  });
-
-  const toolUse = message.content.find((c) => c.type === "tool_use");
-  if (!toolUse || toolUse.type !== "tool_use") {
-    throw new Error("AI không trả về kết quả hợp lệ, vui lòng thử lại");
-  }
-
-  const ket = toolUse.input as {
-    kienThuc: string;
-    kyNang: string;
-    nangLucTuChu: string;
-    hinhThucToChuc: string;
-    danNhap: NoiDungGiaoAn["danNhap"];
-    gioiThieuChuDe: NoiDungGiaoAn["gioiThieuChuDe"];
-    giaiQuyetVanDe: NoiDungGiaoAn["giaiQuyetVanDe"];
-    ketThucVanDe: NoiDungGiaoAn["ketThucVanDe"];
-    huongDanTuHoc: NoiDungGiaoAn["huongDanTuHoc"];
-  };
+  const ket = await goiGeminiJson<KetQuaSoanGiaoAn>(prompt, SCHEMA_KET_QUA);
 
   const noiDungJson: NoiDungGiaoAn = {
     danNhap: ket.danNhap,

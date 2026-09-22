@@ -3,12 +3,13 @@
 Ứng dụng web hỗ trợ quy trình soạn giáo án cho giáo viên trung cấp nghề:
 
 1. **Chương trình môn học** — nhập môn học, các bài học và nội dung chi tiết
-   phân cấp; tự gán số giờ (tiết) cho từng đề mục.
+   phân cấp; tự gán số giờ (tiết) cho từng đề mục. Có thể **nhập trực tiếp
+   từ file Word** (.docx) theo mẫu, AI sẽ đọc và tạo sẵn cấu trúc dữ liệu.
 2. **Lịch trình giảng dạy** — khai báo khung tiết theo thời khóa biểu (thứ
    nào có bao nhiêu tiết), số phút/tiết, ngày bắt đầu và ngày nghỉ. Hệ
    thống tự động xếp các đề mục đã gán thời gian vào từng buổi dạy, cho
    phép chỉnh sửa (ngày, thiết bị, ghi chú) rồi **duyệt**.
-3. **Giáo án** — sau khi lịch trình được duyệt, AI (Claude) soạn giáo án
+3. **Giáo án** — sau khi lịch trình được duyệt, AI (Gemini) soạn giáo án
    trình giảng cho từng buổi theo đúng khung mẫu TCN (Dẫn nhập, Giới thiệu
    chủ đề, Giải quyết vấn đề, Kết thúc vấn đề, Hướng dẫn tự học). Có thể
    chỉnh sửa tay, đánh dấu hoàn thiện và **xuất ra file Word (.docx)**.
@@ -16,11 +17,12 @@
 ## Công nghệ
 
 - [Next.js 16](https://nextjs.org) (App Router, Server Actions, Turbopack)
-- [Prisma 7](https://www.prisma.io) + SQLite (qua driver adapter
-  `@prisma/adapter-better-sqlite3`) — dễ đổi sang PostgreSQL khi cần nhiều
-  người dùng đồng thời
-- [Anthropic SDK](https://www.npmjs.com/package/@anthropic-ai/sdk) (Claude)
-  để soạn nội dung giáo án
+- [Prisma 7](https://www.prisma.io) + PostgreSQL (qua driver adapter
+  `@prisma/adapter-pg`) — dùng được với mọi provider Postgres chuẩn (Neon,
+  Vercel Postgres, Supabase, Railway...)
+- [Google Gen AI SDK](https://www.npmjs.com/package/@google/genai) (Gemini)
+  để soạn nội dung giáo án và đọc file Word chương trình môn học
+- [mammoth](https://www.npmjs.com/package/mammoth) để đọc file .docx
 - [docx](https://www.npmjs.com/package/docx) để xuất file Word
 
 ## Cài đặt & chạy thử
@@ -38,13 +40,15 @@ Mở http://localhost:3000.
 Sao chép `.env.example` thành `.env` và điền:
 
 ```
-DATABASE_URL="file:./dev.db"
-ANTHROPIC_API_KEY="sk-ant-..."   # bắt buộc để dùng tính năng "Soạn giáo án bằng AI"
+DATABASE_URL="postgresql://user:password@host:5432/dbname?sslmode=require"
+GEMINI_API_KEY="..."   # bắt buộc để dùng AI (soạn giáo án, nhập file Word)
 ```
 
-Không có `ANTHROPIC_API_KEY`, toàn bộ ứng dụng vẫn hoạt động bình thường
-(chương trình môn học, lịch trình giảng dạy, xuất Word) — chỉ riêng nút
-"Soạn giáo án bằng AI" / "Soạn lại bằng AI" sẽ báo lỗi.
+`GEMINI_API_KEY` lấy miễn phí tại https://aistudio.google.com/apikey (có
+gói free tier). Không có key, toàn bộ ứng dụng vẫn hoạt động bình thường
+(chương trình môn học, lịch trình giảng dạy, xuất Word) — chỉ riêng các nút
+"Soạn giáo án bằng AI" / "Soạn lại bằng AI" và "Nhập từ file Word" sẽ báo
+lỗi rõ ràng thay vì dùng được.
 
 ## Quy ước dữ liệu quan trọng
 
@@ -64,9 +68,12 @@ Không có `ANTHROPIC_API_KEY`, toàn bộ ứng dụng vẫn hoạt động bì
 ## Cấu trúc thư mục chính
 
 ```
-prisma/schema.prisma        Mô hình dữ liệu
-src/lib/lichtrinh/generate.ts   Thuật toán xếp lịch trình (hàm thuần, có thể test độc lập)
-src/lib/giaoan/generate.ts      Gọi Claude API để soạn giáo án
+prisma/schema.prisma             Mô hình dữ liệu
+prisma/seed-khi-cu-dien.mjs       Script nạp dữ liệu mẫu (môn Khí cụ điện)
+src/lib/lichtrinh/generate.ts    Thuật toán xếp lịch trình (hàm thuần, có thể test độc lập)
+src/lib/gemini.ts                Hàm dùng chung để gọi Gemini với structured JSON output
+src/lib/giaoan/generate.ts       Gọi Gemini để soạn giáo án
+src/lib/chuongtrinh/import.ts    Đọc file Word + gọi Gemini để trích xuất chương trình môn học
 src/lib/actions/*.ts             Server Actions (mutate dữ liệu qua form)
 src/app/*                        Các trang (App Router)
 ```
