@@ -1,7 +1,7 @@
 import { GoogleGenAI, ApiError } from "@google/genai";
 
-const SO_LAN_THU_LAI = 3;
-const CHO_GIUA_CAC_LAN_MS = [3000, 8000, 15000];
+const SO_LAN_THU_LAI = 2;
+const CHO_GIUA_CAC_LAN_MS = [2000, 5000];
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));

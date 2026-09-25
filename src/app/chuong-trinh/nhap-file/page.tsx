@@ -2,6 +2,8 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import NhapChuongTrinhForm from "@/components/NhapChuongTrinhForm";
 
+export const maxDuration = 60;
+
 export default async function NhapFilePage() {
   const giaoVien = await prisma.giaoVien.findMany({ orderBy: { hoTen: "asc" } });
 

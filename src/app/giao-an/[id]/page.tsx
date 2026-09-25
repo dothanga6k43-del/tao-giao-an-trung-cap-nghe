@@ -14,6 +14,8 @@ import {
   xoaGiaoAn,
 } from "@/lib/actions/giao-an";
 
+export const maxDuration = 60;
+
 export default async function GiaoAnDetailPage(
   props: PageProps<"/giao-an/[id]">
 ) {

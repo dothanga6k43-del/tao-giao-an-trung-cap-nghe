@@ -27,6 +27,8 @@ function formatNgay(d: Date) {
   return new Date(d).toISOString().slice(0, 10);
 }
 
+export const maxDuration = 60;
+
 export default async function LichTrinhDetailPage(
   props: PageProps<"/lich-trinh/[id]">
 ) {
