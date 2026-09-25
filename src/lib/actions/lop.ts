@@ -19,6 +19,7 @@ export async function taoLop(formData: FormData) {
   });
 
   revalidatePath("/lop");
+  revalidatePath("/lich-trinh/moi");
   redirect("/lop");
 }
 
@@ -26,4 +27,5 @@ export async function xoaLop(formData: FormData) {
   const id = String(formData.get("id"));
   await prisma.lop.delete({ where: { id } });
   revalidatePath("/lop");
+  revalidatePath("/lich-trinh/moi");
 }

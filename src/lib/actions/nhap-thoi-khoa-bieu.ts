@@ -126,6 +126,7 @@ export async function luuThoiKhoaBieuTuFile(formData: FormData) {
   });
 
   revalidatePath("/thoi-khoa-bieu");
+  revalidatePath("/lich-trinh/moi");
   redirect(`/thoi-khoa-bieu/${id}`);
 }
 
@@ -134,5 +135,6 @@ export async function xoaThoiKhoaBieu(formData: FormData) {
   if (!id) throw new Error("Thiếu id");
   await prisma.thoiKhoaBieu.delete({ where: { id } });
   revalidatePath("/thoi-khoa-bieu");
+  revalidatePath("/lich-trinh/moi");
   redirect("/thoi-khoa-bieu");
 }

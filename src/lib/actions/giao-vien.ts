@@ -14,6 +14,7 @@ export async function taoGiaoVien(formData: FormData) {
   });
 
   revalidatePath("/giao-vien");
+  revalidatePath("/lich-trinh/moi");
   redirect("/giao-vien");
 }
 
@@ -21,4 +22,5 @@ export async function xoaGiaoVien(formData: FormData) {
   const id = String(formData.get("id"));
   await prisma.giaoVien.delete({ where: { id } });
   revalidatePath("/giao-vien");
+  revalidatePath("/lich-trinh/moi");
 }

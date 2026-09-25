@@ -35,6 +35,7 @@ export async function taoMonHoc(formData: FormData) {
   });
 
   revalidatePath("/chuong-trinh");
+  revalidatePath("/lich-trinh/moi");
   redirect(`/chuong-trinh/${mon.id}`);
 }
 
@@ -67,6 +68,7 @@ export async function xoaMonHoc(formData: FormData) {
   const id = String(formData.get("id"));
   await prisma.monHoc.delete({ where: { id } });
   revalidatePath("/chuong-trinh");
+  revalidatePath("/lich-trinh/moi");
   redirect("/chuong-trinh");
 }
 

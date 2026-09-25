@@ -115,5 +115,6 @@ export async function luuChuongTrinhTuFile(formData: FormData) {
   });
 
   revalidatePath("/chuong-trinh");
+  revalidatePath("/lich-trinh/moi");
   redirect(`/chuong-trinh/${monId}`);
 }
