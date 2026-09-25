@@ -1,5 +1,5 @@
 import mammoth from "mammoth";
-import { goiGeminiJson } from "@/lib/gemini";
+import Anthropic from "@anthropic-ai/sdk";
 
 export type NoiDungMucTrichXuat = {
   tieuDe: string;
@@ -34,16 +34,15 @@ export type ChuongTrinhTrichXuat = {
   baiHoc: BaiHocTrichXuat[];
 };
 
-const CHUOI_HOAC_RONG = { anyOf: [{ type: "string" }, { type: "null" }] };
-const SO_HOAC_RONG = { anyOf: [{ type: "number" }, { type: "null" }] };
+const TEN_CONG_CU = "luu_chuong_trinh_mon_hoc";
 
 const MUC_SCHEMA_LA = {
-  type: "object",
+  type: "object" as const,
   properties: {
     tieuDe: { type: "string" },
     loai: { type: "string", enum: ["LT", "TH", "KT"] },
     thoiGianTiet: {
-      ...SO_HOAC_RONG,
+      type: ["number", "null"],
       description:
         "Số giờ/tiết CHỈ khi văn bản gốc nêu rõ cho đúng đề mục này. Nếu không có, để null (người dùng sẽ tự gán sau).",
     },
@@ -51,20 +50,20 @@ const MUC_SCHEMA_LA = {
   required: ["tieuDe", "loai", "thoiGianTiet"],
 };
 
-const SCHEMA_KET_QUA = {
-  type: "object",
+const SCHEMA_CONG_CU = {
+  type: "object" as const,
   properties: {
     tenMonHoc: { type: "string" },
-    maMonHoc: CHUOI_HOAC_RONG,
+    maMonHoc: { type: ["string", "null"] },
     tongSoGio: { type: "number" },
     lyThuyetGio: { type: "number" },
     thucHanhGio: { type: "number" },
     kiemTraGio: { type: "number" },
-    viTriTinhChat: CHUOI_HOAC_RONG,
-    mucTieu: CHUOI_HOAC_RONG,
-    dieuKienThucHien: CHUOI_HOAC_RONG,
-    phuongPhapDanhGia: CHUOI_HOAC_RONG,
-    taiLieuThamKhao: CHUOI_HOAC_RONG,
+    viTriTinhChat: { type: ["string", "null"] },
+    mucTieu: { type: ["string", "null"] },
+    dieuKienThucHien: { type: ["string", "null"] },
+    phuongPhapDanhGia: { type: ["string", "null"] },
+    taiLieuThamKhao: { type: ["string", "null"] },
     baiHoc: {
       type: "array",
       items: {
@@ -76,7 +75,7 @@ const SCHEMA_KET_QUA = {
           lyThuyetGio: { type: "number" },
           thucHanhGio: { type: "number" },
           kiemTraGio: { type: "number" },
-          mucTieu: CHUOI_HOAC_RONG,
+          mucTieu: { type: ["string", "null"] },
           noiDungMuc: {
             type: "array",
             description:
@@ -131,7 +130,10 @@ export async function docHtmlTuDocx(buffer: Buffer): Promise<string> {
 export async function phanTichChuongTrinhBangAI(
   html: string
 ): Promise<ChuongTrinhTrichXuat> {
-  const prompt = `Đây là nội dung HTML trích xuất từ file Word "Chương trình môn học" theo mẫu đào tạo trung cấp nghề Việt Nam. Hãy đọc và trích xuất thành dữ liệu có cấu trúc, trả về đúng theo schema JSON đã cho, không thêm văn bản nào khác ngoài JSON.
+  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+  const model = process.env.ANTHROPIC_MODEL || "claude-sonnet-5";
+
+  const prompt = `Đây là nội dung HTML trích xuất từ file Word "Chương trình môn học" theo mẫu đào tạo trung cấp nghề Việt Nam. Hãy đọc và trích xuất thành dữ liệu có cấu trúc, gọi công cụ ${TEN_CONG_CU}.
 
 Yêu cầu quan trọng:
 - Giữ nguyên văn bản tiếng Việt, không dịch, không rút gọn nội dung mục tiêu/điều kiện thực hiện/tài liệu tham khảo.
@@ -144,5 +146,24 @@ Yêu cầu quan trọng:
 Nội dung HTML:
 ${html}`;
 
-  return goiGeminiJson<ChuongTrinhTrichXuat>(prompt, SCHEMA_KET_QUA);
+  const message = await client.messages.create({
+    model,
+    max_tokens: 8000,
+    messages: [{ role: "user", content: prompt }],
+    tools: [
+      {
+        name: TEN_CONG_CU,
+        description: "Lưu dữ liệu chương trình môn học đã trích xuất",
+        input_schema: SCHEMA_CONG_CU,
+      },
+    ],
+    tool_choice: { type: "tool", name: TEN_CONG_CU },
+  });
+
+  const toolUse = message.content.find((c) => c.type === "tool_use");
+  if (!toolUse || toolUse.type !== "tool_use") {
+    throw new Error("AI không trả về kết quả hợp lệ, vui lòng thử lại");
+  }
+
+  return toolUse.input as ChuongTrinhTrichXuat;
 }
