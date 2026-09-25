@@ -42,7 +42,7 @@ export default async function GiaoAnDetailPage(
 
   return (
     <div className="space-y-8 max-w-4xl">
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-sm text-slate-500">
             <Link href={`/lich-trinh/${giaoAn.buoiDay.lichTrinhId}`} className="hover:underline">
@@ -249,7 +249,7 @@ export default async function GiaoAnDetailPage(
                   placeholder="Nội dung trình bày"
                   className="w-full rounded-md border border-slate-300 px-2.5 py-1.5 text-sm"
                 />
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <textarea
                     name="hoatDongGV"
                     rows={2}
@@ -340,7 +340,7 @@ function MucCoDinhForm({
           <span className="text-xs text-slate-400">phút</span>
         </div>
         <input type="hidden" name="tieuDe" value={muc.tieuDe} />
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           <textarea
             name="hoatDongGV"
             rows={2}

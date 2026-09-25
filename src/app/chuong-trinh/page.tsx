@@ -9,14 +9,14 @@ export default async function ChuongTrinhListPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Chương trình môn học</h1>
           <p className="text-slate-500 mt-1 text-sm">
             Quản lý chương trình môn học, nội dung tổng quát và nội dung chi tiết.
           </p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <Link
             href="/chuong-trinh/nhap-file"
             className="rounded-md border border-slate-300 text-slate-700 px-4 py-2 text-sm font-medium hover:bg-slate-50"

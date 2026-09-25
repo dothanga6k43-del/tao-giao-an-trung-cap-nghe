@@ -14,7 +14,7 @@ export default async function LichTrinhListPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Lịch trình giảng dạy</h1>
           <p className="text-slate-500 mt-1 text-sm">
@@ -24,7 +24,7 @@ export default async function LichTrinhListPage() {
         </div>
         <Link
           href="/lich-trinh/moi"
-          className="rounded-md bg-slate-900 text-white px-4 py-2 text-sm font-medium hover:bg-slate-700"
+          className="self-start rounded-md bg-slate-900 text-white px-4 py-2 text-sm font-medium hover:bg-slate-700"
         >
           + Tạo lịch trình
         </Link>

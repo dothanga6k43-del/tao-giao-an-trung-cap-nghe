@@ -42,7 +42,7 @@ export default async function ThoiKhoaBieuDetailPage({
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-sm text-slate-500">
             <Link href="/thoi-khoa-bieu" className="hover:underline">

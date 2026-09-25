@@ -117,7 +117,7 @@ export default function LichTrinhMoiForm({
       action={taoLichTrinh}
       className="space-y-6 bg-white border border-slate-200 rounded-lg p-6"
     >
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">
             Lớp
@@ -207,7 +207,7 @@ export default function LichTrinhMoiForm({
           <h2 className="text-sm font-semibold text-slate-800">
             Nạp khung tiết từ thời khóa biểu đã lưu
           </h2>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <select
               value={tkbId}
               onChange={(e) => {
@@ -276,55 +276,57 @@ export default function LichTrinhMoiForm({
           Khung tiết theo thời khóa biểu (để trống ngày không học môn này)
         </h2>
         <div className="border border-slate-200 rounded-lg overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-slate-500 text-left">
-              <tr>
-                <th className="p-2 w-24">Thứ</th>
-                <th className="p-2">Tiết bắt đầu</th>
-                <th className="p-2">Số tiết</th>
-                <th className="p-2">Địa điểm</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {THU_LIST.map((thu) => (
-                <tr key={thu}>
-                  <td className="p-2 font-medium">{THU_LABEL[thu]}</td>
-                  <td className="p-2">
-                    <input
-                      ref={(el) => {
-                        tietBatDauRefs.current[thu] = el;
-                      }}
-                      name={`tiet_batdau_${thu}`}
-                      type="number"
-                      min={1}
-                      className="w-24 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
-                    />
-                  </td>
-                  <td className="p-2">
-                    <input
-                      ref={(el) => {
-                        tietSoTietRefs.current[thu] = el;
-                      }}
-                      name={`tiet_sotiet_${thu}`}
-                      type="number"
-                      min={1}
-                      className="w-24 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
-                    />
-                  </td>
-                  <td className="p-2">
-                    <input
-                      ref={(el) => {
-                        tietDiaDiemRefs.current[thu] = el;
-                      }}
-                      name={`tiet_diadiem_${thu}`}
-                      className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
-                      placeholder="X. Điện tử"
-                    />
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[480px]">
+              <thead className="bg-slate-50 text-slate-500 text-left">
+                <tr>
+                  <th className="p-2 w-24">Thứ</th>
+                  <th className="p-2">Tiết bắt đầu</th>
+                  <th className="p-2">Số tiết</th>
+                  <th className="p-2">Địa điểm</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {THU_LIST.map((thu) => (
+                  <tr key={thu}>
+                    <td className="p-2 font-medium">{THU_LABEL[thu]}</td>
+                    <td className="p-2">
+                      <input
+                        ref={(el) => {
+                          tietBatDauRefs.current[thu] = el;
+                        }}
+                        name={`tiet_batdau_${thu}`}
+                        type="number"
+                        min={1}
+                        className="w-24 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                      />
+                    </td>
+                    <td className="p-2">
+                      <input
+                        ref={(el) => {
+                          tietSoTietRefs.current[thu] = el;
+                        }}
+                        name={`tiet_sotiet_${thu}`}
+                        type="number"
+                        min={1}
+                        className="w-24 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                      />
+                    </td>
+                    <td className="p-2">
+                      <input
+                        ref={(el) => {
+                          tietDiaDiemRefs.current[thu] = el;
+                        }}
+                        name={`tiet_diadiem_${thu}`}
+                        className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                        placeholder="X. Điện tử"
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 

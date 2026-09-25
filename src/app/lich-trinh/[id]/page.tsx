@@ -62,7 +62,7 @@ export default async function LichTrinhDetailPage(
 
   return (
     <div className="space-y-8">
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-sm text-slate-500">
             <Link href="/lich-trinh" className="hover:underline">
@@ -100,7 +100,7 @@ export default async function LichTrinhDetailPage(
         </div>
       </div>
 
-      <section className="grid grid-cols-2 gap-6">
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white border border-slate-200 rounded-lg p-5">
           <h2 className="text-sm font-semibold text-slate-800 mb-3">
             Khung tiết theo thời khóa biểu
@@ -144,18 +144,18 @@ export default async function LichTrinhDetailPage(
             )}
           </ul>
           {!daDuyet && (
-            <form action={themNgayNghi} className="flex items-end gap-2">
+            <form action={themNgayNghi} className="flex flex-wrap items-end gap-2">
               <input type="hidden" name="lichTrinhId" value={lichTrinh.id} />
               <input
                 type="date"
                 name="ngay"
                 required
-                className="rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                className="min-w-0 flex-1 rounded-md border border-slate-300 px-2 py-1.5 text-sm sm:flex-none"
               />
               <input
                 name="ghiChu"
                 placeholder="Lý do"
-                className="flex-1 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                className="min-w-0 flex-1 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
               />
               <button className="text-xs rounded-md bg-slate-100 px-3 py-1.5 hover:bg-slate-200">
                 Thêm
@@ -203,8 +203,8 @@ export default async function LichTrinhDetailPage(
                 key={b.id}
                 className="bg-white border border-slate-200 rounded-lg p-4"
               >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
+                  <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-slate-800">
                       Buổi {b.thuTu} · {b.tongTiet} tiết (LT {b.lyThuyetTiet} · TH{" "}
                       {b.thucHanhTiet} · KT {b.kiemTraTiet})
@@ -238,7 +238,7 @@ export default async function LichTrinhDetailPage(
 
                   <form
                     action={suaBuoiDay}
-                    className="w-72 shrink-0 space-y-2"
+                    className="w-full space-y-2 lg:w-72 lg:shrink-0"
                   >
                     <input type="hidden" name="id" value={b.id} />
                     <input type="hidden" name="lichTrinhId" value={lichTrinh.id} />

@@ -15,8 +15,8 @@ export default async function MonHocMoiPage() {
       </div>
 
       <form action={taoMonHoc} className="space-y-5 bg-white border border-slate-200 rounded-lg p-6">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="col-span-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="sm:col-span-2">
             <label className="block text-sm font-medium text-slate-700 mb-1">
               Tên môn học
             </label>
@@ -55,7 +55,7 @@ export default async function MonHocMoiPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
               Tổng số giờ

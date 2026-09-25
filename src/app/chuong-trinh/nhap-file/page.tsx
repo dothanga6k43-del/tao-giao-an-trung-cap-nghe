@@ -17,8 +17,8 @@ export default async function NhapFilePage() {
         </p>
         <h1 className="text-2xl font-semibold mt-1">Nhập từ file Word</h1>
         <p className="text-slate-500 mt-1 text-sm">
-          Tải lên file "Chương trình môn học" (.docx) theo mẫu, AI sẽ đọc và
-          tạo sẵn môn học, các bài và nội dung chi tiết cho bạn.
+          Tải lên file &quot;Chương trình môn học&quot; (.docx) theo mẫu, AI sẽ
+          đọc và tạo sẵn môn học, các bài và nội dung chi tiết cho bạn.
         </p>
       </div>
 
