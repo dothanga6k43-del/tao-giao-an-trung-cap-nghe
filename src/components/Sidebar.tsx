@@ -4,6 +4,7 @@ const NAV_ITEMS = [
   { href: "/chuong-trinh", label: "Chương trình môn học" },
   { href: "/lop", label: "Lớp học" },
   { href: "/giao-vien", label: "Giáo viên" },
+  { href: "/thoi-khoa-bieu", label: "Thời khóa biểu" },
   { href: "/lich-trinh", label: "Lịch trình giảng dạy" },
   { href: "/giao-an", label: "Giáo án" },
 ];

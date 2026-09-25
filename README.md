@@ -5,11 +5,14 @@
 1. **Chương trình môn học** — nhập môn học, các bài học và nội dung chi tiết
    phân cấp; tự gán số giờ (tiết) cho từng đề mục. Có thể **nhập trực tiếp
    từ file Word** (.docx) theo mẫu, AI sẽ đọc và tạo sẵn cấu trúc dữ liệu.
-2. **Lịch trình giảng dạy** — khai báo khung tiết theo thời khóa biểu (thứ
+2. **Thời khóa biểu** — nhập thời khóa biểu theo tuần bằng cách tải lên
+   **ảnh chụp, file Excel (.xlsx) hoặc file Word (.docx)**, AI sẽ đọc và
+   tạo sẵn dữ liệu từng lớp/khối tiết/môn học theo từng thứ trong tuần.
+3. **Lịch trình giảng dạy** — khai báo khung tiết theo thời khóa biểu (thứ
    nào có bao nhiêu tiết), số phút/tiết, ngày bắt đầu và ngày nghỉ. Hệ
    thống tự động xếp các đề mục đã gán thời gian vào từng buổi dạy, cho
    phép chỉnh sửa (ngày, thiết bị, ghi chú) rồi **duyệt**.
-3. **Giáo án** — sau khi lịch trình được duyệt, AI (Claude) soạn giáo án
+4. **Giáo án** — sau khi lịch trình được duyệt, AI (Claude) soạn giáo án
    trình giảng cho từng buổi theo đúng khung mẫu TCN (Dẫn nhập, Giới thiệu
    chủ đề, Giải quyết vấn đề, Kết thúc vấn đề, Hướng dẫn tự học). Có thể
    chỉnh sửa tay, đánh dấu hoàn thiện và **xuất ra file Word (.docx)**.
@@ -23,6 +26,7 @@
 - [Anthropic SDK](https://www.npmjs.com/package/@anthropic-ai/sdk) (Claude)
   để soạn nội dung giáo án và đọc file Word chương trình môn học
 - [mammoth](https://www.npmjs.com/package/mammoth) để đọc file .docx
+- [exceljs](https://www.npmjs.com/package/exceljs) để đọc file .xlsx
 - [docx](https://www.npmjs.com/package/docx) để xuất file Word
 
 ## Cài đặt & chạy thử
@@ -48,8 +52,9 @@ ANTHROPIC_API_KEY="sk-ant-..."   # bắt buộc để dùng AI (soạn giáo án
 (cần nạp tiền trả trước, không có gói miễn phí — xem phần chi phí ước tính
 trong lịch sử trao đổi/README này). Không có key, toàn bộ ứng dụng vẫn
 hoạt động bình thường (chương trình môn học, lịch trình giảng dạy, xuất
-Word) — chỉ riêng các nút "Soạn giáo án bằng AI" / "Soạn lại bằng AI" và
-"Nhập từ file Word" sẽ báo lỗi rõ ràng thay vì dùng được.
+Word) — chỉ riêng các nút "Soạn giáo án bằng AI" / "Soạn lại bằng AI",
+"Nhập từ file Word" và "Nhập thời khóa biểu" sẽ báo lỗi rõ ràng thay vì
+dùng được.
 
 ## Quy ước dữ liệu quan trọng
 

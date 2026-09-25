@@ -181,6 +181,36 @@ model BuoiDayNoiDung {
   noiDungMuc      NoiDungMuc @relation(fields: [noiDungMucId], references: [id])
 }
 
+// Thoi khoa bieu (theo tuan) nhap tu anh/excel/word
+model ThoiKhoaBieu {
+  id            String   @id @default(cuid())
+  tieuDe        String
+  tuanThu       Int?
+  ngayBatDau    DateTime?
+  ngayKetThuc   DateTime?
+  buoiHoc       String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  dong          ThoiKhoaBieuDong[]
+}
+
+// Mot dong day (lop + khoi tiet + thu) trong thoi khoa bieu
+model ThoiKhoaBieuDong {
+  id              String   @id @default(cuid())
+  thoiKhoaBieuId  String
+  lop             String
+  diaDiem         String?
+  tietBlock       String   // vd "1.2" hoac "3.4.5"
+  thu             Int      // 2 = Thu Hai ... 7 = Thu Bay, 8 = Chu Nhat
+  monHoc          String?
+  soGioLuyKe      Float?   // so gio luy ke ghi kem mon hoc trong o, neu co
+  giaoVien        String?
+  ghiChu          String?
+
+  thoiKhoaBieu    ThoiKhoaBieu @relation(fields: [thoiKhoaBieuId], references: [id], onDelete: Cascade)
+}
+
 // Giao an trinh giang cho 1 buoi day
 model GiaoAn {
   id                String   @id @default(cuid())
