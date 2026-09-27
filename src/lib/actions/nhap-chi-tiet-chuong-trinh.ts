@@ -9,6 +9,7 @@ import {
   type ChuongTrinhTrichXuat,
 } from "@/lib/chuongtrinh/import";
 import { vanBanTuExcel } from "@/lib/thoikhoabieu/import";
+import { chuanHoaTenBai } from "@/lib/chuongtrinh/ten-bai";
 
 export type TrangThaiPhanTichChiTiet = {
   data: ChuongTrinhTrichXuat | null;
@@ -72,11 +73,14 @@ export async function luuChiTietTuFile(formData: FormData) {
   await prisma.$transaction(async (tx) => {
     const baiHienCo = await tx.baiHoc.findMany({ where: { monHocId } });
     let soThuTuKeTiep = baiHienCo.length + 1;
+    const daDungId = new Set<string>();
 
     for (const bai of data.baiHoc) {
+      const tenChuanHoa = chuanHoaTenBai(bai.tenBai);
       const trung = baiHienCo.find(
-        (b) => b.tenBai.trim().toLowerCase() === bai.tenBai.trim().toLowerCase()
+        (b) => !daDungId.has(b.id) && chuanHoaTenBai(b.tenBai) === tenChuanHoa
       );
+      if (trung) daDungId.add(trung.id);
 
       // Neu bai da co noi dung chi tiet dang duoc mot lich trinh su dung
       // (da xep vao buoi day), KHONG duoc xoa/ghi de - se vi pham khoa

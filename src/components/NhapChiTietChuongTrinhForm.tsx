@@ -6,6 +6,7 @@ import {
   luuChiTietTuFile,
   type TrangThaiPhanTichChiTiet,
 } from "@/lib/actions/nhap-chi-tiet-chuong-trinh";
+import { chuanHoaTenBai } from "@/lib/chuongtrinh/ten-bai";
 
 const TRANG_THAI_BAN_DAU: TrangThaiPhanTichChiTiet = { data: null, error: null };
 
@@ -75,7 +76,7 @@ function XemTruocVaLuu({
   monHocId: string;
   tenBaiHienCo: string[];
 }) {
-  const tenHienCoThuongHoa = tenBaiHienCo.map((t) => t.trim().toLowerCase());
+  const tenHienCoChuanHoa = tenBaiHienCo.map(chuanHoaTenBai);
 
   return (
     <div className="space-y-6">
@@ -88,7 +89,7 @@ function XemTruocVaLuu({
           Các bài trong file ({data.baiHoc.length})
         </h3>
         {data.baiHoc.map((bai, idx) => {
-          const daCo = tenHienCoThuongHoa.includes(bai.tenBai.trim().toLowerCase());
+          const daCo = tenHienCoChuanHoa.includes(chuanHoaTenBai(bai.tenBai));
           return (
             <div key={idx} className="bg-white border border-slate-200 rounded-lg p-4">
               <p className="font-medium text-slate-900">
