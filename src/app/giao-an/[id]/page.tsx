@@ -1,13 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { parseNoiDungGiaoAn, tongPhutNoiDung } from "@/lib/giaoan/schema";
+import { parseNoiDungGiaoAn, tongPhutNoiDung, type MucGiaoAn } from "@/lib/giaoan/schema";
 import {
   capNhatThongTinChung,
-  suaMucCoDinh,
-  suaMucGiaiQuyet,
-  themMucGiaiQuyet,
-  xoaMucGiaiQuyet,
+  suaMuc,
+  themMuc,
+  xoaMuc,
   soanLaiBangAI,
   hoanThienGiaoAn,
   moLaiGiaoAn,
@@ -199,167 +198,115 @@ export default async function GiaoAnDetailPage(
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">II. Thực hiện bài học</h2>
 
-        <MucCoDinhForm
-          giaoAnId={giaoAn.id}
-          khoa="danNhap"
-          nhan="1. Dẫn nhập"
-          muc={noiDung.danNhap}
-          disabled={daHoanThien}
-        />
-        <MucCoDinhForm
-          giaoAnId={giaoAn.id}
-          khoa="gioiThieuChuDe"
-          nhan="2. Giới thiệu chủ đề"
-          muc={noiDung.gioiThieuChuDe}
-          disabled={daHoanThien}
-        />
-
-        <div className="bg-white border border-slate-200 rounded-lg p-4 space-y-4">
-          <p className="text-sm font-semibold text-slate-800">
-            3. Giải quyết vấn đề (
-            {noiDung.giaiQuyetVanDe.reduce((s, m) => s + m.thoiGianPhut, 0)} phút)
-          </p>
-          {noiDung.giaiQuyetVanDe.map((muc, idx) => (
-            <form
-              key={idx}
-              action={suaMucGiaiQuyet}
-              className="border border-slate-100 rounded-md p-3 space-y-2"
-            >
-              <input type="hidden" name="id" value={giaoAn.id} />
-              <input type="hidden" name="index" value={idx} />
-              <fieldset disabled={daHoanThien} className="space-y-2">
-                <div className="flex gap-2">
-                  <input
-                    name="tieuDe"
-                    defaultValue={muc.tieuDe}
-                    className="flex-1 rounded-md border border-slate-300 px-2.5 py-1.5 text-sm font-medium"
-                  />
-                  <input
-                    name="thoiGianPhut"
-                    type="number"
-                    defaultValue={muc.thoiGianPhut}
-                    className="w-24 rounded-md border border-slate-300 px-2.5 py-1.5 text-sm"
-                  />
-                  <span className="text-xs text-slate-400 self-center">phút</span>
-                </div>
-                <textarea
-                  name="noiDung"
-                  rows={3}
-                  defaultValue={muc.noiDung}
-                  placeholder="Nội dung trình bày"
-                  className="w-full rounded-md border border-slate-300 px-2.5 py-1.5 text-sm"
-                />
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <textarea
-                    name="hoatDongGV"
-                    rows={2}
-                    defaultValue={muc.hoatDongGV}
-                    placeholder="Hoạt động của giáo viên"
-                    className="w-full rounded-md border border-slate-300 px-2.5 py-1.5 text-sm"
-                  />
-                  <textarea
-                    name="hoatDongHS"
-                    rows={2}
-                    defaultValue={muc.hoatDongHS}
-                    placeholder="Hoạt động của học sinh"
-                    className="w-full rounded-md border border-slate-300 px-2.5 py-1.5 text-sm"
-                  />
-                </div>
-                <div className="flex justify-between">
-                  <button className="text-xs rounded-md bg-slate-100 text-slate-700 px-2.5 py-1.5 hover:bg-slate-200">
-                    Lưu
-                  </button>
-                  <button
-                    formAction={xoaMucGiaiQuyet}
-                    className="text-xs text-red-600 hover:underline"
-                  >
-                    Xóa mục
-                  </button>
-                </div>
-              </fieldset>
-            </form>
-          ))}
-          {!daHoanThien && (
-            <form action={themMucGiaiQuyet}>
-              <input type="hidden" name="id" value={giaoAn.id} />
-              <button className="text-xs rounded-md bg-slate-900 text-white px-3 py-1.5 hover:bg-slate-700">
-                + Thêm mục
-              </button>
-            </form>
-          )}
-        </div>
-
-        <MucCoDinhForm
-          giaoAnId={giaoAn.id}
-          khoa="ketThucVanDe"
-          nhan="4. Kết thúc vấn đề"
-          muc={noiDung.ketThucVanDe}
-          disabled={daHoanThien}
-        />
-        <MucCoDinhForm
-          giaoAnId={giaoAn.id}
-          khoa="huongDanTuHoc"
-          nhan="5. Hướng dẫn tự học"
-          muc={noiDung.huongDanTuHoc}
-          disabled={daHoanThien}
-        />
+        {noiDung.khungMuc.map((khung, khungIndex) => (
+          <KhungMucBlock
+            key={khungIndex}
+            giaoAnId={giaoAn.id}
+            khungIndex={khungIndex}
+            soThuTu={khungIndex + 1}
+            tieuDe={khung.khungMucTieuDe}
+            items={khung.items}
+            disabled={daHoanThien}
+          />
+        ))}
       </section>
     </div>
   );
 }
 
-function MucCoDinhForm({
+function KhungMucBlock({
   giaoAnId,
-  khoa,
-  nhan,
-  muc,
+  khungIndex,
+  soThuTu,
+  tieuDe,
+  items,
   disabled,
 }: {
   giaoAnId: string;
-  khoa: "danNhap" | "gioiThieuChuDe" | "ketThucVanDe" | "huongDanTuHoc";
-  nhan: string;
-  muc: { tieuDe: string; thoiGianPhut: number; hoatDongGV: string; hoatDongHS: string };
+  khungIndex: number;
+  soThuTu: number;
+  tieuDe: string;
+  items: MucGiaoAn[];
   disabled: boolean;
 }) {
   return (
-    <form
-      action={suaMucCoDinh}
-      className="bg-white border border-slate-200 rounded-lg p-4 space-y-2"
-    >
-      <input type="hidden" name="id" value={giaoAnId} />
-      <input type="hidden" name="khoa" value={khoa} />
-      <fieldset disabled={disabled} className="space-y-2">
-        <div className="flex items-center gap-2">
-          <p className="text-sm font-semibold text-slate-800 flex-1">{nhan}</p>
-          <input
-            name="thoiGianPhut"
-            type="number"
-            defaultValue={muc.thoiGianPhut}
-            className="w-20 rounded-md border border-slate-300 px-2.5 py-1.5 text-sm"
-          />
-          <span className="text-xs text-slate-400">phút</span>
-        </div>
-        <input type="hidden" name="tieuDe" value={muc.tieuDe} />
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          <textarea
-            name="hoatDongGV"
-            rows={2}
-            defaultValue={muc.hoatDongGV}
-            placeholder="Hoạt động của giáo viên"
-            className="w-full rounded-md border border-slate-300 px-2.5 py-1.5 text-sm"
-          />
-          <textarea
-            name="hoatDongHS"
-            rows={2}
-            defaultValue={muc.hoatDongHS}
-            placeholder="Hoạt động của học sinh"
-            className="w-full rounded-md border border-slate-300 px-2.5 py-1.5 text-sm"
-          />
-        </div>
-        <button className="text-xs rounded-md bg-slate-100 text-slate-700 px-2.5 py-1.5 hover:bg-slate-200">
-          Lưu
-        </button>
-      </fieldset>
-    </form>
+    <div className="bg-white border border-slate-200 rounded-lg p-4 space-y-4">
+      <p className="text-sm font-semibold text-slate-800">
+        {soThuTu}. {tieuDe} (
+        {items.reduce((s, m) => s + m.thoiGianPhut, 0)} phút)
+      </p>
+      {items.map((muc, mucIndex) => (
+        <form
+          key={mucIndex}
+          action={suaMuc}
+          className="border border-slate-100 rounded-md p-3 space-y-2"
+        >
+          <input type="hidden" name="id" value={giaoAnId} />
+          <input type="hidden" name="khungIndex" value={khungIndex} />
+          <input type="hidden" name="mucIndex" value={mucIndex} />
+          <fieldset disabled={disabled} className="space-y-2">
+            <div className="flex gap-2">
+              <input
+                name="tieuDe"
+                defaultValue={muc.tieuDe}
+                className="flex-1 rounded-md border border-slate-300 px-2.5 py-1.5 text-sm font-medium"
+              />
+              <input
+                name="thoiGianPhut"
+                type="number"
+                defaultValue={muc.thoiGianPhut}
+                className="w-24 rounded-md border border-slate-300 px-2.5 py-1.5 text-sm"
+              />
+              <span className="text-xs text-slate-400 self-center">phút</span>
+            </div>
+            <textarea
+              name="noiDung"
+              rows={3}
+              defaultValue={muc.noiDung}
+              placeholder="Nội dung trình bày (nếu có)"
+              className="w-full rounded-md border border-slate-300 px-2.5 py-1.5 text-sm"
+            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <textarea
+                name="hoatDongGV"
+                rows={2}
+                defaultValue={muc.hoatDongGV}
+                placeholder="Hoạt động của giáo viên"
+                className="w-full rounded-md border border-slate-300 px-2.5 py-1.5 text-sm"
+              />
+              <textarea
+                name="hoatDongHS"
+                rows={2}
+                defaultValue={muc.hoatDongHS}
+                placeholder="Hoạt động của học sinh"
+                className="w-full rounded-md border border-slate-300 px-2.5 py-1.5 text-sm"
+              />
+            </div>
+            <div className="flex justify-between">
+              <button className="text-xs rounded-md bg-slate-100 text-slate-700 px-2.5 py-1.5 hover:bg-slate-200">
+                Lưu
+              </button>
+              {items.length > 1 && (
+                <button
+                  formAction={xoaMuc}
+                  className="text-xs text-red-600 hover:underline"
+                >
+                  Xóa mục
+                </button>
+              )}
+            </div>
+          </fieldset>
+        </form>
+      ))}
+      {!disabled && (
+        <form action={themMuc}>
+          <input type="hidden" name="id" value={giaoAnId} />
+          <input type="hidden" name="khungIndex" value={khungIndex} />
+          <button className="text-xs rounded-md bg-slate-900 text-white px-3 py-1.5 hover:bg-slate-700">
+            + Thêm mục
+          </button>
+        </form>
+      )}
+    </div>
   );
 }

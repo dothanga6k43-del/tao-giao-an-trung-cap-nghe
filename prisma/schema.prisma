@@ -59,6 +59,8 @@ model MonHoc {
   phuongPhapDanhGia String?
   taiLieuThamKhao   String?
   giaoVienId        String?
+  mauGiaoAnTenFile     String? // ten file mau giao an da tai len (.docx/.pdf)
+  mauGiaoAnCauTrucJson String? // JSON: KhungMucMau[] - cau truc cac muc trich xuat tu file mau
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 

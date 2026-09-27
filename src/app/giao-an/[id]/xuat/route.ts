@@ -94,17 +94,39 @@ export async function GET(
       ],
     });
 
-  const hangGiaiQuyet = noiDung.giaiQuyetVanDe.map((m) =>
-    new TableRow({
-      children: [
-        oO("", { width: 6 }),
-        oO(`${m.tieuDe}\n${m.noiDung}`, { width: 30 }),
-        oO(m.hoatDongGV, { width: 27 }),
-        oO(m.hoatDongHS, { width: 27 }),
-        oO(`${m.thoiGianPhut} phút`, { width: 10 }),
-      ],
-    })
-  );
+  const hangKhungMuc = noiDung.khungMuc.flatMap((khung, idx) => {
+    const stt = String(idx + 1);
+    if (khung.items.length === 1) {
+      const m = khung.items[0];
+      return [
+        hangCoDinh(stt, m.tieuDe || khung.khungMucTieuDe, m.hoatDongGV, m.hoatDongHS, m.thoiGianPhut),
+      ];
+    }
+    const tongPhutKhung = khung.items.reduce((s, m) => s + m.thoiGianPhut, 0);
+    return [
+      new TableRow({
+        children: [
+          oO(stt, { width: 6 }),
+          oO(khung.khungMucTieuDe, { width: 30, bold: true }),
+          oO("", { width: 27 }),
+          oO("", { width: 27 }),
+          oO(`${tongPhutKhung} phút`, { width: 10 }),
+        ],
+      }),
+      ...khung.items.map(
+        (m) =>
+          new TableRow({
+            children: [
+              oO("", { width: 6 }),
+              oO(`${m.tieuDe}\n${m.noiDung}`, { width: 30 }),
+              oO(m.hoatDongGV, { width: 27 }),
+              oO(m.hoatDongHS, { width: 27 }),
+              oO(`${m.thoiGianPhut} phút`, { width: 10 }),
+            ],
+          })
+      ),
+    ];
+  });
 
   const doc = new Document({
     sections: [
@@ -150,47 +172,7 @@ export async function GET(
                   oO("THỜI GIAN", { width: 10, header: true, bold: true }),
                 ],
               }),
-              hangCoDinh(
-                "1",
-                noiDung.danNhap.tieuDe || "Dẫn nhập",
-                noiDung.danNhap.hoatDongGV,
-                noiDung.danNhap.hoatDongHS,
-                noiDung.danNhap.thoiGianPhut
-              ),
-              hangCoDinh(
-                "2",
-                noiDung.gioiThieuChuDe.tieuDe || "Giới thiệu chủ đề",
-                noiDung.gioiThieuChuDe.hoatDongGV,
-                noiDung.gioiThieuChuDe.hoatDongHS,
-                noiDung.gioiThieuChuDe.thoiGianPhut
-              ),
-              new TableRow({
-                children: [
-                  oO("3", { width: 6 }),
-                  oO("Giải quyết vấn đề", { width: 30, bold: true }),
-                  oO("", { width: 27 }),
-                  oO("", { width: 27 }),
-                  oO(
-                    `${noiDung.giaiQuyetVanDe.reduce((s, m) => s + m.thoiGianPhut, 0)} phút`,
-                    { width: 10 }
-                  ),
-                ],
-              }),
-              ...hangGiaiQuyet,
-              hangCoDinh(
-                "4",
-                noiDung.ketThucVanDe.tieuDe || "Kết thúc vấn đề",
-                noiDung.ketThucVanDe.hoatDongGV,
-                noiDung.ketThucVanDe.hoatDongHS,
-                noiDung.ketThucVanDe.thoiGianPhut
-              ),
-              hangCoDinh(
-                "5",
-                noiDung.huongDanTuHoc.tieuDe || "Hướng dẫn tự học",
-                noiDung.huongDanTuHoc.hoatDongGV,
-                noiDung.huongDanTuHoc.hoatDongHS,
-                noiDung.huongDanTuHoc.thoiGianPhut
-              ),
+              ...hangKhungMuc,
             ],
           }),
 

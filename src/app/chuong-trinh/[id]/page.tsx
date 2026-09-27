@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { taoBaiHoc, xoaBaiHoc, xoaMonHoc } from "@/lib/actions/chuong-trinh";
+import { xoaMauGiaoAn } from "@/lib/actions/giao-an-mau";
 
 export default async function MonHocDetailPage(props: PageProps<"/chuong-trinh/[id]">) {
   const { id } = await props.params;
@@ -45,6 +46,33 @@ export default async function MonHocDetailPage(props: PageProps<"/chuong-trinh/[
             Xóa môn học
           </button>
         </form>
+      </div>
+
+      <div className="bg-white border border-slate-200 rounded-lg p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-sm font-medium text-slate-800">Mẫu giáo án riêng</p>
+          <p className="text-sm text-slate-500">
+            {mon.mauGiaoAnTenFile
+              ? `Đang dùng mẫu: ${mon.mauGiaoAnTenFile}`
+              : "Chưa có mẫu riêng — AI sẽ soạn giáo án theo khung mặc định (Dẫn nhập, Giới thiệu chủ đề, Giải quyết vấn đề, Kết thúc vấn đề, Hướng dẫn tự học)."}
+          </p>
+        </div>
+        <div className="flex items-center gap-3 self-start">
+          <Link
+            href={`/chuong-trinh/${mon.id}/mau-giao-an`}
+            className="text-sm rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-50"
+          >
+            {mon.mauGiaoAnTenFile ? "Thay mẫu khác" : "Tải lên mẫu giáo án"}
+          </Link>
+          {mon.mauGiaoAnTenFile && (
+            <form action={xoaMauGiaoAn}>
+              <input type="hidden" name="monHocId" value={mon.id} />
+              <button type="submit" className="text-sm text-red-600 hover:underline">
+                Bỏ mẫu
+              </button>
+            </form>
+          )}
+        </div>
       </div>
 
       <section className="space-y-3">

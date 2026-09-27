@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { soanGiaoAnBangAI } from "@/lib/giaoan/generate";
-import { parseNoiDungGiaoAn, type NoiDungGiaoAn, type MucGiaoAn } from "@/lib/giaoan/schema";
+import { parseNoiDungGiaoAn } from "@/lib/giaoan/schema";
 
 export async function taoGiaoAnBangAI(formData: FormData) {
   const buoiDayId = String(formData.get("buoiDayId"));
@@ -36,50 +36,17 @@ export async function capNhatThongTinChung(formData: FormData) {
   revalidatePath(`/giao-an/${id}`);
 }
 
-const KHOA_CO_DINH = [
-  "danNhap",
-  "gioiThieuChuDe",
-  "ketThucVanDe",
-  "huongDanTuHoc",
-] as const;
-type KhoaCoDinh = (typeof KHOA_CO_DINH)[number];
-
-function laKhoaCoDinh(v: string): v is KhoaCoDinh {
-  return (KHOA_CO_DINH as readonly string[]).includes(v);
-}
-
-export async function suaMucCoDinh(formData: FormData) {
+export async function suaMuc(formData: FormData) {
   const id = String(formData.get("id"));
-  const khoa = String(formData.get("khoa") ?? "");
-  if (!laKhoaCoDinh(khoa)) throw new Error("Mục không hợp lệ");
+  const khungIndex = Number(formData.get("khungIndex"));
+  const mucIndex = Number(formData.get("mucIndex"));
 
   const giaoAn = await prisma.giaoAn.findUniqueOrThrow({ where: { id } });
   const noiDung = parseNoiDungGiaoAn(giaoAn.noiDungJson);
+  const khung = noiDung.khungMuc[khungIndex];
+  if (!khung || !khung.items[mucIndex]) throw new Error("Mục không tồn tại");
 
-  const muc: MucGiaoAn = {
-    tieuDe: String(formData.get("tieuDe") ?? "").trim(),
-    thoiGianPhut: Number(formData.get("thoiGianPhut") ?? 0),
-    hoatDongGV: String(formData.get("hoatDongGV") ?? "").trim(),
-    hoatDongHS: String(formData.get("hoatDongHS") ?? "").trim(),
-  };
-  noiDung[khoa] = muc;
-
-  await prisma.giaoAn.update({
-    where: { id },
-    data: { noiDungJson: JSON.stringify(noiDung) },
-  });
-  revalidatePath(`/giao-an/${id}`);
-}
-
-export async function suaMucGiaiQuyet(formData: FormData) {
-  const id = String(formData.get("id"));
-  const index = Number(formData.get("index"));
-
-  const giaoAn = await prisma.giaoAn.findUniqueOrThrow({ where: { id } });
-  const noiDung = parseNoiDungGiaoAn(giaoAn.noiDungJson);
-  if (!noiDung.giaiQuyetVanDe[index]) throw new Error("Mục không tồn tại");
-
-  noiDung.giaiQuyetVanDe[index] = {
+  khung.items[mucIndex] = {
     tieuDe: String(formData.get("tieuDe") ?? "").trim(),
     thoiGianPhut: Number(formData.get("thoiGianPhut") ?? 0),
     noiDung: String(formData.get("noiDung") ?? "").trim(),
@@ -94,12 +61,16 @@ export async function suaMucGiaiQuyet(formData: FormData) {
   revalidatePath(`/giao-an/${id}`);
 }
 
-export async function themMucGiaiQuyet(formData: FormData) {
+export async function themMuc(formData: FormData) {
   const id = String(formData.get("id"));
+  const khungIndex = Number(formData.get("khungIndex"));
+
   const giaoAn = await prisma.giaoAn.findUniqueOrThrow({ where: { id } });
   const noiDung = parseNoiDungGiaoAn(giaoAn.noiDungJson);
+  const khung = noiDung.khungMuc[khungIndex];
+  if (!khung) throw new Error("Khung mục không tồn tại");
 
-  noiDung.giaiQuyetVanDe.push({
+  khung.items.push({
     tieuDe: "Mục mới",
     thoiGianPhut: 0,
     noiDung: "",
@@ -114,12 +85,19 @@ export async function themMucGiaiQuyet(formData: FormData) {
   revalidatePath(`/giao-an/${id}`);
 }
 
-export async function xoaMucGiaiQuyet(formData: FormData) {
+export async function xoaMuc(formData: FormData) {
   const id = String(formData.get("id"));
-  const index = Number(formData.get("index"));
+  const khungIndex = Number(formData.get("khungIndex"));
+  const mucIndex = Number(formData.get("mucIndex"));
+
   const giaoAn = await prisma.giaoAn.findUniqueOrThrow({ where: { id } });
   const noiDung = parseNoiDungGiaoAn(giaoAn.noiDungJson);
-  noiDung.giaiQuyetVanDe.splice(index, 1);
+  const khung = noiDung.khungMuc[khungIndex];
+  if (!khung) throw new Error("Khung mục không tồn tại");
+  if (khung.items.length <= 1) {
+    throw new Error("Không thể xóa dòng cuối cùng của một mục");
+  }
+  khung.items.splice(mucIndex, 1);
 
   await prisma.giaoAn.update({
     where: { id },

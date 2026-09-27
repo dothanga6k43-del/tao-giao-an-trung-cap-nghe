@@ -1,95 +1,61 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { prisma } from "@/lib/prisma";
-import type { NoiDungGiaoAn } from "./schema";
+import { parseCauTrucMau, type NoiDungGiaoAn, type MucGiaoAn } from "./schema";
 
 const TEN_CONG_CU = "soan_giao_an";
 
-const SCHEMA_CONG_CU = {
+const MUC_SCHEMA = {
   type: "object" as const,
   properties: {
-    kienThuc: { type: "string", description: "Mục tiêu về kiến thức, dạng gạch đầu dòng" },
-    kyNang: { type: "string", description: "Mục tiêu về kỹ năng, dạng gạch đầu dòng" },
-    nangLucTuChu: {
-      type: "string",
-      description: "Mục tiêu về năng lực tự chủ và tự chịu trách nhiệm",
-    },
-    hinhThucToChuc: {
+    tieuDe: { type: "string" },
+    thoiGianPhut: { type: "number" },
+    noiDung: {
       type: "string",
       description:
-        "Hình thức tổ chức dạy học cho từng phần (dẫn nhập, giới thiệu chủ đề, lý thuyết liên quan, trình tự thực hiện, thực hành, kết thúc, hướng dẫn tự học)",
+        "Nội dung trình bày chi tiết (có thể xuống dòng, gạch đầu dòng). Để chuỗi rỗng nếu mục này không cần trình bày nội dung riêng.",
     },
-    danNhap: {
-      type: "object",
-      properties: {
-        tieuDe: { type: "string" },
-        thoiGianPhut: { type: "number" },
-        hoatDongGV: { type: "string" },
-        hoatDongHS: { type: "string" },
-      },
-      required: ["tieuDe", "thoiGianPhut", "hoatDongGV", "hoatDongHS"],
-    },
-    gioiThieuChuDe: {
-      type: "object",
-      properties: {
-        tieuDe: { type: "string" },
-        thoiGianPhut: { type: "number" },
-        hoatDongGV: { type: "string" },
-        hoatDongHS: { type: "string" },
-      },
-      required: ["tieuDe", "thoiGianPhut", "hoatDongGV", "hoatDongHS"],
-    },
-    giaiQuyetVanDe: {
-      type: "array",
-      description:
-        "Các mục trong phần 'Giải quyết vấn đề': I. Lý thuyết liên quan (theo từng đề mục Lý thuyết), II. Trình tự thực hiện, III. Thực hành (theo từng đề mục Thực hành/Kiểm tra). Tổng thời gian các mục này phải khớp với thời gian còn lại.",
-      items: {
-        type: "object",
-        properties: {
-          tieuDe: { type: "string" },
-          thoiGianPhut: { type: "number" },
-          noiDung: {
-            type: "string",
-            description: "Nội dung trình bày chi tiết (có thể xuống dòng, gạch đầu dòng)",
-          },
-          hoatDongGV: { type: "string" },
-          hoatDongHS: { type: "string" },
-        },
-        required: ["tieuDe", "thoiGianPhut", "noiDung", "hoatDongGV", "hoatDongHS"],
-      },
-    },
-    ketThucVanDe: {
-      type: "object",
-      properties: {
-        tieuDe: { type: "string" },
-        thoiGianPhut: { type: "number" },
-        hoatDongGV: { type: "string" },
-        hoatDongHS: { type: "string" },
-      },
-      required: ["tieuDe", "thoiGianPhut", "hoatDongGV", "hoatDongHS"],
-    },
-    huongDanTuHoc: {
-      type: "object",
-      properties: {
-        tieuDe: { type: "string" },
-        thoiGianPhut: { type: "number" },
-        hoatDongGV: { type: "string" },
-        hoatDongHS: { type: "string" },
-      },
-      required: ["tieuDe", "thoiGianPhut", "hoatDongGV", "hoatDongHS"],
-    },
+    hoatDongGV: { type: "string" },
+    hoatDongHS: { type: "string" },
   },
-  required: [
-    "kienThuc",
-    "kyNang",
-    "nangLucTuChu",
-    "hinhThucToChuc",
-    "danNhap",
-    "gioiThieuChuDe",
-    "giaiQuyetVanDe",
-    "ketThucVanDe",
-    "huongDanTuHoc",
-  ],
+  required: ["tieuDe", "thoiGianPhut", "noiDung", "hoatDongGV", "hoatDongHS"],
 };
+
+function taoSchemaCongCu(tenCacKhung: string[]) {
+  return {
+    type: "object" as const,
+    properties: {
+      kienThuc: { type: "string", description: "Mục tiêu về kiến thức, dạng gạch đầu dòng" },
+      kyNang: { type: "string", description: "Mục tiêu về kỹ năng, dạng gạch đầu dòng" },
+      nangLucTuChu: {
+        type: "string",
+        description: "Mục tiêu về năng lực tự chủ và tự chịu trách nhiệm",
+      },
+      hinhThucToChuc: {
+        type: "string",
+        description: "Hình thức tổ chức dạy học cho buổi dạy này",
+      },
+      khungMuc: {
+        type: "array",
+        description: `Phải có đúng ${tenCacKhung.length} phần tử, theo đúng thứ tự sau (khungMucTieuDe phải khớp chính xác): ${tenCacKhung.map((t, i) => `${i + 1}. "${t}"`).join("; ")}.`,
+        items: {
+          type: "object",
+          properties: {
+            khungMucTieuDe: { type: "string", enum: tenCacKhung },
+            items: {
+              type: "array",
+              description:
+                "Một hoặc nhiều dòng nội dung cho phần này. Dùng nhiều dòng khi phần này cần chia nhỏ (ví dụ Lý thuyết liên quan / Trình tự thực hiện / Thực hành), một dòng nếu là mục đơn giản.",
+              items: MUC_SCHEMA,
+              minItems: 1,
+            },
+          },
+          required: ["khungMucTieuDe", "items"],
+        },
+      },
+    },
+    required: ["kienThuc", "kyNang", "nangLucTuChu", "hinhThucToChuc", "khungMuc"],
+  };
+}
 
 export async function soanGiaoAnBangAI(buoiDayId: string) {
   const buoiDay = await prisma.buoiDay.findUniqueOrThrow({
@@ -104,13 +70,6 @@ export async function soanGiaoAnBangAI(buoiDayId: string) {
   });
 
   const tongPhut = buoiDay.tongTiet * buoiDay.lichTrinh.soPhutMoiTiet;
-  const onDinhLop = 1;
-  const danNhapGoi = tongPhut > 120 ? 3 : 2;
-  const gioiThieuGoi = 3;
-  const ketThucGoi = 3;
-  const huongDanGoi = 2;
-  const phutGiaiQuyet =
-    tongPhut - onDinhLop - danNhapGoi - gioiThieuGoi - ketThucGoi - huongDanGoi;
 
   const tenBaiList = Array.from(
     new Set(buoiDay.noiDung.map((n) => n.noiDungMuc.baiHoc.tenBai))
@@ -128,9 +87,18 @@ export async function soanGiaoAnBangAI(buoiDayId: string) {
     })
     .join("\n");
 
+  const khungMau = parseCauTrucMau(buoiDay.lichTrinh.monHoc.mauGiaoAnCauTrucJson);
+  const tenCacKhung = khungMau.map((k) => k.tieuDe);
+  const moTaKhung = khungMau
+    .map(
+      (k, i) => `${i + 1}. "${k.tieuDe}"${k.moTa ? ` — ${k.moTa}` : ""}`
+    )
+    .join("\n");
+
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-  const prompt = `Bạn là giáo viên trung cấp nghề đang soạn một "Giáo án trình giảng" cho một buổi dạy, theo đúng mẫu giáo án trình giảng TCN (gồm phần Mục tiêu, Đồ dùng thiết bị, Hình thức tổ chức, và bảng Thực hiện bài học với các mục: Dẫn nhập, Giới thiệu chủ đề, Giải quyết vấn đề (I. Lý thuyết liên quan, II. Trình tự thực hiện, III. Thực hành), Kết thúc vấn đề, Hướng dẫn tự học).
+  const prompt = `Bạn là giáo viên trung cấp nghề đang soạn một "Giáo án trình giảng" cho một buổi dạy, theo đúng mẫu giáo án của môn học này gồm phần Mục tiêu, Đồ dùng thiết bị, Hình thức tổ chức, và bảng Thực hiện bài học với các phần theo đúng thứ tự sau:
+${moTaKhung}
 
 Thông tin buổi dạy:
 - Môn học: ${buoiDay.lichTrinh.monHoc.tenMonHoc}
@@ -143,13 +111,11 @@ Nội dung chi tiết cần dạy trong buổi này (đã được phân bổ th
 ${dsNoiDung}
 
 Yêu cầu phân bổ thời gian (bắt buộc tuân theo, đơn vị phút):
-- Dẫn nhập: khoảng ${danNhapGoi} phút
-- Giới thiệu chủ đề: khoảng ${gioiThieuGoi} phút
-- Giải quyết vấn đề (tổng các mục con): đúng ${phutGiaiQuyet} phút, chia theo tỉ lệ thời lượng của từng đề mục chi tiết ở trên (mục Lý thuyết liên quan cho các đề mục Lý thuyết, mục Trình tự thực hiện + Thực hành cho các đề mục Thực hành, có thể thêm mục Kiểm tra nếu có đề mục Kiểm tra)
-- Kết thúc vấn đề: khoảng ${ketThucGoi} phút
-- Hướng dẫn tự học: khoảng ${huongDanGoi} phút
+- Tổng thời gian của TẤT CẢ các dòng trong khungMuc phải đúng bằng ${tongPhut} phút.
+- Các phần mở đầu/kết thúc (dẫn nhập, giới thiệu, kết thúc, hướng dẫn tự học hoặc tương đương) nên ngắn gọn, khoảng 2-5 phút mỗi phần.
+- Phần nội dung chính (thường là phần ở giữa, ví dụ "Giải quyết vấn đề" hoặc tương đương) chiếm phần lớn thời gian còn lại, chia theo đúng tỉ lệ thời lượng của từng đề mục chi tiết ở trên.
 
-Hãy soạn nội dung bằng tiếng Việt, văn phong sư phạm, cụ thể với nội dung chuyên môn ở trên (không viết chung chung). Gọi công cụ ${TEN_CONG_CU} với đầy đủ dữ liệu.`;
+Hãy soạn nội dung bằng tiếng Việt, văn phong sư phạm, cụ thể với nội dung chuyên môn ở trên (không viết chung chung). Gọi công cụ ${TEN_CONG_CU} với đầy đủ dữ liệu, đúng thứ tự và tên các khungMucTieuDe đã nêu.`;
 
   const model = process.env.ANTHROPIC_MODEL || "claude-sonnet-5";
 
@@ -161,7 +127,7 @@ Hãy soạn nội dung bằng tiếng Việt, văn phong sư phạm, cụ thể 
       {
         name: TEN_CONG_CU,
         description: "Lưu nội dung giáo án trình giảng đã soạn",
-        input_schema: SCHEMA_CONG_CU,
+        input_schema: taoSchemaCongCu(tenCacKhung),
       },
     ],
     tool_choice: { type: "tool", name: TEN_CONG_CU },
@@ -177,20 +143,14 @@ Hãy soạn nội dung bằng tiếng Việt, văn phong sư phạm, cụ thể 
     kyNang: string;
     nangLucTuChu: string;
     hinhThucToChuc: string;
-    danNhap: NoiDungGiaoAn["danNhap"];
-    gioiThieuChuDe: NoiDungGiaoAn["gioiThieuChuDe"];
-    giaiQuyetVanDe: NoiDungGiaoAn["giaiQuyetVanDe"];
-    ketThucVanDe: NoiDungGiaoAn["ketThucVanDe"];
-    huongDanTuHoc: NoiDungGiaoAn["huongDanTuHoc"];
+    khungMuc: { khungMucTieuDe: string; items: MucGiaoAn[] }[];
   };
 
-  const noiDungJson: NoiDungGiaoAn = {
-    danNhap: ket.danNhap,
-    gioiThieuChuDe: ket.gioiThieuChuDe,
-    giaiQuyetVanDe: ket.giaiQuyetVanDe,
-    ketThucVanDe: ket.ketThucVanDe,
-    huongDanTuHoc: ket.huongDanTuHoc,
-  };
+  if (!Array.isArray(ket.khungMuc) || ket.khungMuc.length === 0) {
+    throw new Error("AI không soạn được nội dung giáo án, vui lòng thử lại");
+  }
+
+  const noiDungJson: NoiDungGiaoAn = { khungMuc: ket.khungMuc };
 
   const giaoAn = await prisma.giaoAn.upsert({
     where: { buoiDayId },
