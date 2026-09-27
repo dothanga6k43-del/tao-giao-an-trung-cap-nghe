@@ -4,7 +4,10 @@
 
 1. **Chương trình môn học** — nhập môn học, các bài học và nội dung chi tiết
    phân cấp; tự gán số giờ (tiết) cho từng đề mục. Có thể **nhập trực tiếp
-   từ file Word** (.docx) theo mẫu, AI sẽ đọc và tạo sẵn cấu trúc dữ liệu.
+   từ file Word (.docx) hoặc Excel (.xlsx)** để tạo môn học mới hoàn toàn,
+   hoặc **nhập/cập nhật riêng phần chương trình chi tiết** vào một môn học
+   đã có sẵn — AI đọc file và khớp vào các bài theo tên (tạo bài mới nếu
+   chưa có).
 2. **Thời khóa biểu** — nhập thời khóa biểu theo tuần bằng cách tải lên
    **ảnh chụp, file Excel (.xlsx) hoặc file Word (.docx)**, AI sẽ đọc và
    tạo sẵn dữ liệu từng lớp/khối tiết/môn học theo từng thứ trong tuần.
@@ -14,8 +17,12 @@
    phép chỉnh sửa (ngày, thiết bị, ghi chú) rồi **duyệt**.
 4. **Giáo án** — sau khi lịch trình được duyệt, AI (Claude) soạn giáo án
    trình giảng cho từng buổi theo đúng khung mẫu TCN (Dẫn nhập, Giới thiệu
-   chủ đề, Giải quyết vấn đề, Kết thúc vấn đề, Hướng dẫn tự học). Có thể
-   chỉnh sửa tay, đánh dấu hoàn thiện và **xuất ra file Word (.docx)**.
+   chủ đề, Giải quyết vấn đề, Kết thúc vấn đề, Hướng dẫn tự học), hoặc theo
+   **mẫu giáo án riêng của môn học** nếu đã tải lên. Tiêu đề và thời gian
+   của phần nội dung chính lấy **chính xác** từ các đề mục và thời gian mà
+   lịch trình đã phân bổ cho buổi dạy đó (không để AI tự suy diễn), AI chỉ
+   soạn phần nội dung trình bày/hoạt động GV-HS cho đúng các đề mục đó. Có
+   thể chỉnh sửa tay, đánh dấu hoàn thiện và **xuất ra file Word (.docx)**.
 
 ## Công nghệ
 
@@ -53,8 +60,8 @@ ANTHROPIC_API_KEY="sk-ant-..."   # bắt buộc để dùng AI (soạn giáo án
 trong lịch sử trao đổi/README này). Không có key, toàn bộ ứng dụng vẫn
 hoạt động bình thường (chương trình môn học, lịch trình giảng dạy, xuất
 Word) — chỉ riêng các nút "Soạn giáo án bằng AI" / "Soạn lại bằng AI",
-"Nhập từ file Word" và "Nhập thời khóa biểu" sẽ báo lỗi rõ ràng thay vì
-dùng được.
+"Nhập từ file Word", "Nhập chi tiết từ file" và "Nhập thời khóa biểu" sẽ
+báo lỗi rõ ràng thay vì dùng được.
 
 ## Quy ước dữ liệu quan trọng
 

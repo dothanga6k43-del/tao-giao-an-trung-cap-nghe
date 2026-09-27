@@ -114,11 +114,11 @@ type ThongTinLoi = {
 };
 
 async function trichXuatThongTinLoi(html: string): Promise<ThongTinLoi> {
-  const prompt = `Đây là nội dung HTML trích xuất từ file Word "Chương trình môn học" theo mẫu đào tạo trung cấp nghề Việt Nam. Chỉ trích xuất: tên môn học, mã môn học, tổng số giờ (và LT/TH/KT), và danh sách các bài từ bảng "Nội dung tổng quát và phân phối thời gian" (tên bài, số giờ mỗi bài). KHÔNG cần các đoạn văn bản dài như mục tiêu/điều kiện thực hiện/tài liệu tham khảo, và KHÔNG cần nội dung chi tiết (1., 1.1...) của từng bài. Gọi công cụ ${TEN_CONG_CU_LOI}.
+  const prompt = `Đây là nội dung trích xuất từ file "Chương trình môn học" (Word hoặc Excel) theo mẫu đào tạo trung cấp nghề Việt Nam. Chỉ trích xuất: tên môn học, mã môn học, tổng số giờ (và LT/TH/KT), và danh sách các bài từ bảng "Nội dung tổng quát và phân phối thời gian" (tên bài, số giờ mỗi bài). KHÔNG cần các đoạn văn bản dài như mục tiêu/điều kiện thực hiện/tài liệu tham khảo, và KHÔNG cần nội dung chi tiết (1., 1.1...) của từng bài. Gọi công cụ ${TEN_CONG_CU_LOI}.
 
 Lưu ý: nếu đoạn mô tả chi tiết từng bài ("Thời gian: Xh (LT: Yh; TH: Zh)") có số khác với bảng tổng quát, ưu tiên đoạn mô tả chi tiết.
 
-Nội dung HTML:
+Nội dung:
 ${html}`;
 
   const message = await client().messages.create({
@@ -167,9 +167,9 @@ async function trichXuatMoTaMotPhan<T extends Record<string, string | null>>(
   cacDoan: string,
   properties: Record<string, { type: string[] }>
 ): Promise<T> {
-  const prompt = `Đây là nội dung HTML trích xuất từ file Word "Chương trình môn học". Hãy trích xuất nguyên văn (không dịch, không rút gọn) các đoạn sau nếu có: ${cacDoan}. Gọi công cụ ${TEN_CONG_CU_MO_TA}. Nếu không có đoạn nào đó, để null.
+  const prompt = `Đây là nội dung trích xuất từ file "Chương trình môn học" (Word hoặc Excel). Hãy trích xuất nguyên văn (không dịch, không rút gọn) các đoạn sau nếu có: ${cacDoan}. Gọi công cụ ${TEN_CONG_CU_MO_TA}. Nếu không có đoạn nào đó, để null.
 
-Nội dung HTML:
+Nội dung:
 ${html}`;
 
   const required = Object.keys(properties);
@@ -261,7 +261,7 @@ async function trichXuatChiTietMotBai(
   html: string,
   tenBai: string
 ): Promise<NoiDungMucTrichXuat[]> {
-  const prompt = `Đây là nội dung HTML của file Word "Chương trình môn học". Trong phần "Nội dung chi tiết", hãy tìm đúng phần của bài có tên "${tenBai}" và trích xuất TOÀN BỘ đề mục phân cấp (dạng 1., 1.1., 1.2...) của RIÊNG bài này, gọi công cụ ${TEN_CONG_CU_CHI_TIET}. Bỏ qua nội dung chi tiết của các bài khác.
+  const prompt = `Đây là nội dung trích xuất từ file "Chương trình môn học" (Word hoặc Excel). Trong phần "Nội dung chi tiết", hãy tìm đúng phần của bài có tên "${tenBai}" và trích xuất TOÀN BỘ đề mục phân cấp (dạng 1., 1.1., 1.2...) của RIÊNG bài này, gọi công cụ ${TEN_CONG_CU_CHI_TIET}. Bỏ qua nội dung chi tiết của các bài khác.
 
 Yêu cầu:
 - Giữ nguyên văn bản tiếng Việt.
@@ -270,7 +270,7 @@ Yêu cầu:
 - Xác định "loai" (LT/TH/KT) dựa vào ngữ cảnh: mặc định LT trừ khi rõ ràng là thực hành (TH) hoặc kiểm tra (KT).
 - TUYỆT ĐỐI KHÔNG tự bịa số giờ cho từng đề mục — để thoiGianTiet = null nếu văn bản không nói rõ số giờ cho đúng đề mục đó.
 
-Nội dung HTML:
+Nội dung:
 ${html}`;
 
   const message = await client().messages.create({

@@ -76,16 +76,24 @@ export default async function MonHocDetailPage(props: PageProps<"/chuong-trinh/[
       </div>
 
       <section className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">
-            Nội dung tổng quát (các bài)
-          </h2>
-          <p className="text-sm text-slate-500">
-            Tổng thời lượng các bài: {tongGioBai} / {mon.tongSoGio} giờ
-            {tongGioBai !== mon.tongSoGio && (
-              <span className="text-amber-600"> (chưa khớp tổng số giờ môn học)</span>
-            )}
-          </p>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-lg font-semibold">
+              Nội dung tổng quát (các bài)
+            </h2>
+            <p className="text-sm text-slate-500">
+              Tổng thời lượng các bài: {tongGioBai} / {mon.tongSoGio} giờ
+              {tongGioBai !== mon.tongSoGio && (
+                <span className="text-amber-600"> (chưa khớp tổng số giờ môn học)</span>
+              )}
+            </p>
+          </div>
+          <Link
+            href={`/chuong-trinh/${mon.id}/nhap-chi-tiet`}
+            className="self-start rounded-md border border-slate-300 text-slate-700 px-3 py-1.5 text-sm font-medium hover:bg-slate-50"
+          >
+            + Nhập chi tiết từ file
+          </Link>
         </div>
 
         <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
