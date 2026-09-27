@@ -21,17 +21,43 @@ type MucCoDinh = {
   thoiGianPhut: number;
 };
 
-// Xac dinh chi so cac "khung giua" (noi dung chinh, khong phai mo dau/ket
-// thuc) trong mau giao an - dung chung logic voi phan bo thoi gian: khung
-// dau va 1-2 khung cuoi coi la bia (dan nhap/gioi thieu/ket thuc/huong dan
-// tu hoc hoac tuong duong), con lai la noi dung chinh.
+// Xac dinh chi so cac "khung giua" (noi dung chinh, noi de xep de muc chi
+// tiet chinh xac tu lich trinh) trong mau giao an. Dung TU KHOA ngu nghia
+// (khong dung vi tri/so luong) de nhan dien khung mo dau va khung ket thuc -
+// vi mau giao an moi mon co the co so luong khung khac nhau (5 khung mac
+// dinh, hoac nhieu hon voi mau rieng nhu giao an thuc hanh). Khung khong
+// khop tu khoa nao duoc coi la noi dung chinh.
+const TU_KHOA_MO_DAU = [
+  "dẫn nhập",
+  "giới thiệu",
+  "ổn định",
+  "kiểm tra bài cũ",
+  "khởi động",
+];
+const TU_KHOA_KET_THUC = [
+  "kết thúc",
+  "củng cố",
+  "tự học",
+  "tổng kết",
+  "nhận xét",
+  "đánh giá kết quả",
+  "giao bài",
+  "dặn dò",
+];
+
+function laKhungMoDauHoacKetThuc(khung: KhungMucMau): boolean {
+  const vanBan = `${khung.tieuDe} ${khung.moTa ?? ""}`.toLowerCase();
+  return [...TU_KHOA_MO_DAU, ...TU_KHOA_KET_THUC].some((tu) => vanBan.includes(tu));
+}
+
 function xacDinhKhungGiua(khungMau: KhungMucMau[]): number[] {
-  if (khungMau.length <= 2) return [];
-  const soKhungDau = 1;
-  const soKhungCuoi = khungMau.length > 4 ? 2 : 1;
-  const ket: number[] = [];
-  for (let i = soKhungDau; i < khungMau.length - soKhungCuoi; i++) ket.push(i);
-  return ket;
+  if (khungMau.length <= 1) return [];
+  const ket = khungMau
+    .map((k, i) => (laKhungMoDauHoacKetThuc(k) ? -1 : i))
+    .filter((i) => i >= 0);
+  // Neu khong khung nao khop tu khoa (mau la, khong xac dinh duoc), coi tat
+  // ca la noi dung chinh de van co the xep de muc chinh xac vao dau do.
+  return ket.length > 0 ? ket : khungMau.map((_, i) => i);
 }
 
 // Phan cac de muc chi tiet (da co san tieu de + thoi gian chinh xac tu lich
