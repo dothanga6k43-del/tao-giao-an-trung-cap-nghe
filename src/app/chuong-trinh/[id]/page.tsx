@@ -6,6 +6,9 @@ import { xoaMauGiaoAn } from "@/lib/actions/giao-an-mau";
 
 export default async function MonHocDetailPage(props: PageProps<"/chuong-trinh/[id]">) {
   const { id } = await props.params;
+  const searchParams = await props.searchParams;
+  const boQuaChiTiet =
+    typeof searchParams.boQuaChiTiet === "string" ? searchParams.boQuaChiTiet : null;
 
   const mon = await prisma.monHoc.findUnique({
     where: { id },
@@ -21,6 +24,14 @@ export default async function MonHocDetailPage(props: PageProps<"/chuong-trinh/[
 
   return (
     <div className="space-y-8">
+      {boQuaChiTiet && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-800">
+          Đã bỏ qua cập nhật nội dung chi tiết cho: <strong>{boQuaChiTiet}</strong> — bài
+          này đang được dùng trong một lịch trình giảng dạy đã xếp buổi, không thể
+          ghi đè. Hãy &quot;Mở duyệt lại&quot; và xóa lịch trình liên quan trước nếu
+          muốn cập nhật nội dung chi tiết của bài này.
+        </div>
+      )}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-sm text-slate-500">

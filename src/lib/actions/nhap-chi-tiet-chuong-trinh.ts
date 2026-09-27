@@ -67,6 +67,7 @@ export async function luuChiTietTuFile(formData: FormData) {
   if (!raw) throw new Error("Không có dữ liệu để lưu");
 
   const data = JSON.parse(raw) as ChuongTrinhTrichXuat;
+  const boQua: string[] = [];
 
   await prisma.$transaction(async (tx) => {
     const baiHienCo = await tx.baiHoc.findMany({ where: { monHocId } });
@@ -76,6 +77,19 @@ export async function luuChiTietTuFile(formData: FormData) {
       const trung = baiHienCo.find(
         (b) => b.tenBai.trim().toLowerCase() === bai.tenBai.trim().toLowerCase()
       );
+
+      // Neu bai da co noi dung chi tiet dang duoc mot lich trinh su dung
+      // (da xep vao buoi day), KHONG duoc xoa/ghi de - se vi pham khoa
+      // ngoai va co the lam hong lich trinh dang chay. Bo qua bai nay.
+      if (trung) {
+        const soLuongDangDung = await tx.buoiDayNoiDung.count({
+          where: { noiDungMuc: { baiHocId: trung.id } },
+        });
+        if (soLuongDangDung > 0) {
+          boQua.push(bai.tenBai);
+          continue;
+        }
+      }
 
       const baiHocId = trung
         ? trung.id
@@ -137,5 +151,7 @@ export async function luuChiTietTuFile(formData: FormData) {
   });
 
   revalidatePath(`/chuong-trinh/${monHocId}`);
-  redirect(`/chuong-trinh/${monHocId}`);
+  const thamSo =
+    boQua.length > 0 ? `?boQuaChiTiet=${encodeURIComponent(boQua.join(", "))}` : "";
+  redirect(`/chuong-trinh/${monHocId}${thamSo}`);
 }
