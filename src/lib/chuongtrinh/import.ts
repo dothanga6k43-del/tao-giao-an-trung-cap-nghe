@@ -294,9 +294,20 @@ ${html}`;
   return (toolUse.input as { noiDungMuc: NoiDungMucTrichXuat[] }).noiDungMuc;
 }
 
+// Gioi han kich thuoc noi dung dau vao. Ham nay chay 6 lenh goi AI song
+// song, moi lenh deu gui lai TOAN BO noi dung - neu file qua lon, gioi han
+// 1 trieu token/request cua Claude se bi vi pham o nhieu lenh cung luc. Bao
+// loi ro rang som thay vi de API tra ve loi kho hieu sau khi da cho lau.
+const GIOI_HAN_NOI_DUNG_KY_TU = 800_000;
+
 export async function phanTichChuongTrinhBangAI(
   html: string
 ): Promise<ChuongTrinhTrichXuat> {
+  if (html.length > GIOI_HAN_NOI_DUNG_KY_TU) {
+    throw new Error(
+      "File quá lớn để AI đọc (nội dung quá dài). Vui lòng tách file chương trình thành các phần nhỏ hơn (ví dụ từng môn học riêng) rồi nhập từng phần."
+    );
+  }
   const loi = await trichXuatThongTinLoi(html);
 
   const [moTaDai, ...noiDungTungBai] = await Promise.all([

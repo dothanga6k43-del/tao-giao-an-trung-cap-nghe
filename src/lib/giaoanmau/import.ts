@@ -68,15 +68,33 @@ async function goiAITrichXuat(
   return ket.khungMuc;
 }
 
+// Gioi han kich thuoc de tranh gui file qua lon cho Claude (gioi han 1 trieu
+// token/request). File mau giao an chi can vai trang la du, nen day la
+// nguong an toan chu khong phai gioi han ky thuat that su - neu vuot, bao
+// loi ro rang ngay thay vi de API tra ve loi kho hieu sau khi da ton thoi
+// gian upload.
+const GIOI_HAN_PDF_BYTES = 15 * 1024 * 1024; // 15MB
+const GIOI_HAN_HTML_KY_TU = 500_000;
+
 export async function phanTichMauGiaoAnTuDocx(buffer: Buffer): Promise<KhungMucMau[]> {
   const html = await docHtmlTuDocx(buffer);
   if (!html.trim()) {
     throw new Error("Không đọc được nội dung từ file này");
   }
+  if (html.length > GIOI_HAN_HTML_KY_TU) {
+    throw new Error(
+      "File quá lớn để phân tích (nội dung quá dài). Mẫu giáo án thường chỉ cần vài trang - vui lòng cắt bớt file chỉ giữ lại phần giáo án mẫu rồi thử lại."
+    );
+  }
   return goiAITrichXuat([{ type: "text", text: `${HUONG_DAN}\n\nNội dung HTML:\n${html}` }]);
 }
 
 export async function phanTichMauGiaoAnTuPdf(buffer: Buffer): Promise<KhungMucMau[]> {
+  if (buffer.length > GIOI_HAN_PDF_BYTES) {
+    throw new Error(
+      `File PDF quá lớn (${(buffer.length / 1024 / 1024).toFixed(1)}MB). Mẫu giáo án thường chỉ cần vài trang - vui lòng chỉ giữ lại vài trang có mẫu giáo án (ví dụ dùng công cụ tách/nén PDF) rồi thử lại.`
+    );
+  }
   const base64 = buffer.toString("base64");
   return goiAITrichXuat([
     {

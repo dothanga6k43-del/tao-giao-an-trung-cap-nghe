@@ -10,6 +10,7 @@ import {
 } from "@/lib/chuongtrinh/import";
 import { vanBanTuExcel } from "@/lib/thoikhoabieu/import";
 import { chuanHoaTenBai } from "@/lib/chuongtrinh/ten-bai";
+import { dienGiaiLoiAI } from "@/lib/dien-giai-loi-ai";
 
 export type TrangThaiPhanTichChiTiet = {
   data: ChuongTrinhTrichXuat | null;
@@ -51,13 +52,7 @@ export async function phanTichFileChiTiet(
 
     return { data: null, error: "Chỉ hỗ trợ file Word (.docx) hoặc Excel (.xlsx)" };
   } catch (e) {
-    return {
-      data: null,
-      error:
-        e instanceof Error
-          ? `Lỗi khi phân tích file: ${e.message}`
-          : "Lỗi không xác định khi phân tích file",
-    };
+    return { data: null, error: dienGiaiLoiAI(e) };
   }
 }
 

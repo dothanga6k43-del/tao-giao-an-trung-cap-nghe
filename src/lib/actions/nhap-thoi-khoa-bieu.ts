@@ -10,6 +10,7 @@ import {
   phanTichThoiKhoaBieuTuVanBan,
   type ThoiKhoaBieuTrichXuat,
 } from "@/lib/thoikhoabieu/import";
+import { dienGiaiLoiAI } from "@/lib/dien-giai-loi-ai";
 
 export type TrangThaiPhanTichTKB = {
   data: ThoiKhoaBieuTrichXuat | null;
@@ -75,13 +76,7 @@ export async function phanTichFileThoiKhoaBieu(
       error: "Chỉ hỗ trợ file ảnh (png/jpg/webp), Excel (.xlsx) hoặc Word (.docx)",
     };
   } catch (e) {
-    return {
-      data: null,
-      error:
-        e instanceof Error
-          ? `Lỗi khi phân tích file: ${e.message}`
-          : "Lỗi không xác định khi phân tích file",
-    };
+    return { data: null, error: dienGiaiLoiAI(e) };
   }
 }
 

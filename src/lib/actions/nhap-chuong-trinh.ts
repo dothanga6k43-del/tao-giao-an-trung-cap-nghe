@@ -8,6 +8,7 @@ import {
   phanTichChuongTrinhBangAI,
   type ChuongTrinhTrichXuat,
 } from "@/lib/chuongtrinh/import";
+import { dienGiaiLoiAI } from "@/lib/dien-giai-loi-ai";
 
 export type TrangThaiPhanTich = {
   data: ChuongTrinhTrichXuat | null;
@@ -36,13 +37,7 @@ export async function phanTichFileWord(
     const data = await phanTichChuongTrinhBangAI(html);
     return { data, error: null };
   } catch (e) {
-    return {
-      data: null,
-      error:
-        e instanceof Error
-          ? `Lỗi khi phân tích file: ${e.message}`
-          : "Lỗi không xác định khi phân tích file",
-    };
+    return { data: null, error: dienGiaiLoiAI(e) };
   }
 }
 

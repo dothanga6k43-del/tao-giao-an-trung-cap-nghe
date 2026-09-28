@@ -8,6 +8,7 @@ import {
   phanTichMauGiaoAnTuPdf,
 } from "@/lib/giaoanmau/import";
 import type { KhungMucMau } from "@/lib/giaoan/schema";
+import { dienGiaiLoiAI } from "@/lib/dien-giai-loi-ai";
 
 export type TrangThaiPhanTichMau = {
   data: KhungMucMau[] | null;
@@ -42,14 +43,7 @@ export async function phanTichFileMauGiaoAn(
 
     return { data: null, tenFile: null, error: "Chỉ hỗ trợ file Word (.docx) hoặc PDF (.pdf)" };
   } catch (e) {
-    return {
-      data: null,
-      tenFile: null,
-      error:
-        e instanceof Error
-          ? `Lỗi khi phân tích file: ${e.message}`
-          : "Lỗi không xác định khi phân tích file",
-    };
+    return { data: null, tenFile: null, error: dienGiaiLoiAI(e) };
   }
 }
 
