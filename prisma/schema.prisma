@@ -27,6 +27,11 @@ enum VaiTro {
   GIAO_VIEN
 }
 
+enum LoaiMonHoc {
+  NGHE // Mon hoc/mo dun nghe - theo mau giao an GDNN (Quyet dinh 62/2008/QD-BLDTBXH)
+  VAN_HOA // Mon chung/van hoa (Toan, Van, Anh, GDCD...) - theo mau Cong van 5512/BGDDT-GDTrH
+}
+
 model GiaoVien {
   id            String   @id @default(cuid())
   hoTen         String
@@ -90,6 +95,7 @@ model MonHoc {
   lyThuyetGio       Float
   thucHanhGio       Float
   kiemTraGio        Float
+  loaiMon           LoaiMonHoc @default(NGHE)
   viTriTinhChat     String?
   mucTieu           String? // markdown/plain text, muc tieu chung cua mon hoc
   dieuKienThucHien  String?

@@ -1,7 +1,11 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { prisma } from "@/lib/prisma";
+import type { LoaiMonHoc } from "@prisma/client";
 import {
   parseCauTrucMau,
+  KHUNG_MAU_NGHE_LY_THUYET,
+  KHUNG_MAU_NGHE_THUC_HANH,
+  KHUNG_MAU_VAN_HOA,
   type NoiDungGiaoAn,
   type MucGiaoAn,
   type KhungMucMau,
@@ -15,7 +19,7 @@ function model() {
   return process.env.ANTHROPIC_MODEL || "claude-sonnet-5";
 }
 
-type MucCoDinh = {
+export type MucCoDinh = {
   tieuDe: string;
   loai: "LT" | "TH" | "KT";
   thoiGianPhut: number;
@@ -43,14 +47,29 @@ const TU_KHOA_KET_THUC = [
   "đánh giá kết quả",
   "giao bài",
   "dặn dò",
+  "vận dụng",
 ];
+
+// Chon khung mau mac dinh (khi mon hoc chua tai mau rieng) theo loai mon va
+// thanh phan noi dung cua buoi day:
+// - VAN_HOA: luon dung mau 4 hoat dong theo Cong van 5512.
+// - NGHE, buoi day THUAN THUC HANH (khong co de muc LT nao): dung mau 6
+//   phan "giao an thuc hanh" (them Huong dan ban dau/thuong xuyen/ket thuc).
+// - NGHE, con lai (co LT hoac hon hop): mau 5 phan "giao an ly thuyet".
+export function chonKhungMacDinh(loaiMon: LoaiMonHoc, dsMuc: MucCoDinh[]): KhungMucMau[] {
+  if (loaiMon === "VAN_HOA") return KHUNG_MAU_VAN_HOA;
+  const coLyThuyet = dsMuc.some((m) => m.loai !== "TH");
+  const coThucHanh = dsMuc.some((m) => m.loai === "TH");
+  if (coThucHanh && !coLyThuyet) return KHUNG_MAU_NGHE_THUC_HANH;
+  return KHUNG_MAU_NGHE_LY_THUYET;
+}
 
 function laKhungMoDauHoacKetThuc(khung: KhungMucMau): boolean {
   const vanBan = `${khung.tieuDe} ${khung.moTa ?? ""}`.toLowerCase();
   return [...TU_KHOA_MO_DAU, ...TU_KHOA_KET_THUC].some((tu) => vanBan.includes(tu));
 }
 
-function xacDinhKhungGiua(khungMau: KhungMucMau[]): number[] {
+export function xacDinhKhungGiua(khungMau: KhungMucMau[]): number[] {
   if (khungMau.length <= 1) return [];
   const ket = khungMau
     .map((k, i) => (laKhungMoDauHoacKetThuc(k) ? -1 : i))
@@ -65,7 +84,7 @@ function xacDinhKhungGiua(khungMau: KhungMucMau[]): number[] {
 // Neu co 2+ khung giua (vd mau thuc hanh: Huong dan ban dau / Huong dan
 // thuong xuyen), tach theo loai: Ly thuyet + Kiem tra vao khung dau tien,
 // Thuc hanh vao khung cuoi cung trong so cac khung giua.
-function phanMucVaoKhungGiua(
+export function phanMucVaoKhungGiua(
   khungGiuaIdx: number[],
   dsMuc: MucCoDinh[]
 ): Map<number, MucCoDinh[]> {
@@ -356,7 +375,12 @@ export async function soanGiaoAnBangAI(buoiDayId: string) {
   }));
   const tongPhutMucCoDinh = dsMucCoDinh.reduce((s, m) => s + m.thoiGianPhut, 0);
 
-  const khungMau = parseCauTrucMau(buoiDay.lichTrinh.monHoc.mauGiaoAnCauTrucJson);
+  const loaiMon = buoiDay.lichTrinh.monHoc.loaiMon;
+  const khungMacDinh = chonKhungMacDinh(loaiMon, dsMucCoDinh);
+  const khungMau = parseCauTrucMau(
+    buoiDay.lichTrinh.monHoc.mauGiaoAnCauTrucJson,
+    khungMacDinh
+  );
   const khungGiuaIdx = xacDinhKhungGiua(khungMau);
   const mucTheoKhungGiua = phanMucVaoKhungGiua(khungGiuaIdx, dsMucCoDinh);
 
@@ -372,6 +396,13 @@ export async function soanGiaoAnBangAI(buoiDayId: string) {
       ? Math.floor(phutConLaiChoHeuristic / khungCanHeuristic.length)
       : 0;
 
+  const huongDanTheoLoaiMon =
+    loaiMon === "VAN_HOA"
+      ? `Đây là môn văn hóa/môn chung (không phải môn nghề), soạn theo tinh thần Kế hoạch bài dạy phát triển phẩm chất, năng lực (Công văn 5512/BGDĐT-GDTrH): mỗi phần/hoạt động cần thể hiện rõ Mục tiêu, Nội dung, Sản phẩm (kết quả học sinh cần đạt được) và Tổ chức thực hiện (GV giao nhiệm vụ/quan sát/hướng dẫn/nhận xét - HS thực hiện/báo cáo/thảo luận) - lồng các ý này vào phần nội dung trình bày và hoạt động GV/HS, không cần nêu lời thoại cụ thể.`
+      : khungMacDinh === KHUNG_MAU_NGHE_THUC_HANH
+        ? `Đây là buổi dạy thực hành rèn kỹ năng nghề, soạn theo mẫu giáo án thực hành (Quyết định 62/2008/QĐ-BLĐTBXH): phần "Hướng dẫn ban đầu" là GV thao tác mẫu/làm mẫu quy trình; phần "Hướng dẫn thường xuyên" là học sinh luyện tập, GV quan sát uốn nắn - LUÔN nhắc an toàn lao động và các sai hỏng thường gặp cần tránh.`
+        : `Soạn theo mẫu giáo án lý thuyết/tích hợp của giáo dục nghề nghiệp (Quyết định 62/2008/QĐ-BLĐTBXH).`;
+
   const boiCanh = `Bạn là giáo viên trung cấp nghề đang soạn một "Giáo án trình giảng" cho một buổi dạy.
 
 Thông tin buổi dạy:
@@ -383,6 +414,8 @@ Thông tin buổi dạy:
 
 Nội dung chi tiết cần dạy trong buổi này (đã được phân bổ thời gian theo tiết, 1 tiết = ${soPhutMoiTiet} phút):
 ${dsNoiDung}
+
+${huongDanTheoLoaiMon}
 
 Hãy soạn nội dung bằng tiếng Việt, văn phong sư phạm, cụ thể với nội dung chuyên môn ở trên (không viết chung chung, nhưng cũng không viết dài dòng).`;
 

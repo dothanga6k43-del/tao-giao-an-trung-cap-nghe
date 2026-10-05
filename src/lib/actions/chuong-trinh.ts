@@ -3,9 +3,13 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { LoaiNoiDung } from "@prisma/client";
+import { LoaiNoiDung, LoaiMonHoc } from "@prisma/client";
 import { layTaiKhoanHienTai } from "@/lib/auth/session";
 import { giaoVienIdKhiTao, yeuCauQuyenSua } from "@/lib/auth/pham-vi";
+
+function loaiMonOr(v: FormDataEntryValue | null): LoaiMonHoc {
+  return v === "VAN_HOA" ? "VAN_HOA" : "NGHE";
+}
 
 function numOr0(v: FormDataEntryValue | null) {
   const n = Number(v ?? 0);
@@ -30,6 +34,7 @@ export async function taoMonHoc(formData: FormData) {
     data: {
       tenMonHoc,
       maMonHoc: String(formData.get("maMonHoc") ?? "").trim() || null,
+      loaiMon: loaiMonOr(formData.get("loaiMon")),
       tongSoGio: numOr0(formData.get("tongSoGio")),
       lyThuyetGio: numOr0(formData.get("lyThuyetGio")),
       thucHanhGio: numOr0(formData.get("thucHanhGio")),
@@ -74,6 +79,17 @@ export async function capNhatMonHoc(formData: FormData) {
         String(formData.get("taiLieuThamKhao") ?? "").trim() || null,
       giaoVienId: String(formData.get("giaoVienId") ?? "").trim() || null,
     },
+  });
+  revalidatePath(`/chuong-trinh/${id}`);
+}
+
+export async function capNhatLoaiMon(formData: FormData) {
+  const id = String(formData.get("id"));
+  await yeuCauQuyenVoiMonHoc(id);
+
+  await prisma.monHoc.update({
+    where: { id },
+    data: { loaiMon: loaiMonOr(formData.get("loaiMon")) },
   });
   revalidatePath(`/chuong-trinh/${id}`);
 }

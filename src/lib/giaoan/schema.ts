@@ -28,7 +28,10 @@ export type KhungMucMau = {
   moTa: string | null;
 };
 
-export const KHUNG_MAU_MAC_DINH: KhungMucMau[] = [
+// Mau "giao an ly thuyet" - mon/buoi day nghe co noi dung ly thuyet (hoac
+// hon hop ly thuyet + thuc hanh). Dung cau truc 5 phan theo mau giao an GDNN
+// (Quyet dinh 62/2008/QD-BLDTBXH, mau so 5 - So giao an ly thuyet).
+export const KHUNG_MAU_NGHE_LY_THUYET: KhungMucMau[] = [
   {
     tieuDe: "Dẫn nhập",
     moTa: "Dẫn dắt vào bài, tạo hứng thú cho người học, khoảng 2-3 phút",
@@ -52,17 +55,86 @@ export const KHUNG_MAU_MAC_DINH: KhungMucMau[] = [
   },
 ];
 
+// Mau "giao an thuc hanh" - mon/buoi day nghe co noi dung THUAN THUC HANH
+// (ren ky nang, khong co ly thuyet moi). Cau truc 6 phan theo mau giao an
+// GDNN (Quyet dinh 62/2008/QD-BLDTBXH, mau so 6 - So giao an thuc hanh):
+// them "Huong dan ban dau" (GV lam mau/thi pham) va "Huong dan thuong
+// xuyen" (HS luyen tap, GV theo doi uon nan, luu y an toan lao dong) thay
+// cho "Giai quyet van de" cua mau ly thuyet.
+export const KHUNG_MAU_NGHE_THUC_HANH: KhungMucMau[] = [
+  {
+    tieuDe: "Dẫn nhập",
+    moTa: "Dẫn dắt vào bài, tạo hứng thú cho người học, khoảng 2-3 phút",
+  },
+  {
+    tieuDe: "Giới thiệu chủ đề",
+    moTa: "Nêu tên bài, mục tiêu rèn luyện kỹ năng và yêu cầu sản phẩm cần đạt",
+  },
+  {
+    tieuDe: "Hướng dẫn ban đầu",
+    moTa:
+      "Giáo viên thao tác mẫu/làm mẫu quy trình, hướng dẫn trình tự các bước thực hiện và tiêu chuẩn kỹ thuật cần đạt",
+  },
+  {
+    tieuDe: "Hướng dẫn thường xuyên",
+    moTa:
+      "Học sinh luyện tập thực hành (theo các đề mục Thực hành/Kiểm tra); giáo viên quan sát, uốn nắn, nhắc nhở an toàn lao động trong suốt quá trình",
+  },
+  {
+    tieuDe: "Hướng dẫn kết thúc",
+    moTa:
+      "Nhận xét kết quả thực hành, chỉ ra sai hỏng thường gặp và cách khắc phục, nhắc lại an toàn lao động",
+  },
+  {
+    tieuDe: "Hướng dẫn tự học",
+    moTa: "Giao nhiệm vụ luyện tập thêm, tài liệu tham khảo",
+  },
+];
+
+// Mau "giao an mon van hoa/mon chung" (Toan, Ngu van, Tieng Anh, GDCD...)
+// - khac han cau truc giao an nghe. Theo mau Ke hoach bai day, Phu luc IV
+// Cong van 5512/BGDDT-GDTrH: 4 hoat dong, moi hoat dong gom Muc tieu - Noi
+// dung - San pham - To chuc thuc hien (AI se viet long cac y nay vao phan
+// "noi dung trinh bay" cua tung muc vi cau truc du lieu hien tai la dang
+// phang, khong tach rieng 4 truong con).
+export const KHUNG_MAU_VAN_HOA: KhungMucMau[] = [
+  {
+    tieuDe: "Hoạt động khởi động",
+    moTa:
+      "Gây hứng thú đầu giờ, kết nối kiến thức cũ với bài mới (nêu rõ Mục tiêu - Nội dung - Sản phẩm - Tổ chức thực hiện)",
+  },
+  {
+    tieuDe: "Hoạt động hình thành kiến thức mới",
+    moTa:
+      "Tổ chức cho học sinh khám phá, phân tích, xây dựng kiến thức mới của bài học (nêu rõ Mục tiêu - Nội dung - Sản phẩm - Tổ chức thực hiện)",
+  },
+  {
+    tieuDe: "Hoạt động luyện tập",
+    moTa:
+      "Rèn luyện, khắc sâu kiến thức vừa học qua bài tập, câu hỏi, tình huống cụ thể (nêu rõ Mục tiêu - Nội dung - Sản phẩm - Tổ chức thực hiện)",
+  },
+  {
+    tieuDe: "Hoạt động vận dụng",
+    moTa:
+      "Học sinh vận dụng kiến thức, kỹ năng đã học vào tình huống/thực tiễn mới hoặc nhiệm vụ về nhà (nêu rõ Mục tiêu - Nội dung - Sản phẩm - Tổ chức thực hiện)",
+  },
+];
+
+// Giu ten cu lam alias de tuong thich nguoc voi noi con dung truc tiep.
+export const KHUNG_MAU_MAC_DINH = KHUNG_MAU_NGHE_LY_THUYET;
+
 export function parseCauTrucMau(
-  json: string | null | undefined
+  json: string | null | undefined,
+  macDinh: KhungMucMau[] = KHUNG_MAU_NGHE_LY_THUYET
 ): KhungMucMau[] {
-  if (!json) return KHUNG_MAU_MAC_DINH;
+  if (!json) return macDinh;
   try {
     const arr = JSON.parse(json) as KhungMucMau[];
     if (Array.isArray(arr) && arr.length > 0) return arr;
   } catch {
     // rơi xuống mặc định nếu JSON hỏng
   }
-  return KHUNG_MAU_MAC_DINH;
+  return macDinh;
 }
 
 // Dinh dang cu (truoc khi tong quat hoa theo mau rieng tung mon): cac truong

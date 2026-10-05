@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { taoBaiHoc, xoaBaiHoc, xoaMonHoc } from "@/lib/actions/chuong-trinh";
+import { taoBaiHoc, xoaBaiHoc, xoaMonHoc, capNhatLoaiMon } from "@/lib/actions/chuong-trinh";
 import { xoaMauGiaoAn } from "@/lib/actions/giao-an-mau";
 import { ganGiaoVienChoMonHoc } from "@/lib/actions/gan-giao-vien";
 import { layTaiKhoanHienTai } from "@/lib/auth/session";
@@ -76,6 +76,24 @@ export default async function MonHocDetailPage(props: PageProps<"/chuong-trinh/[
             {mon.kiemTraGio})
             {!laAdmin && mon.giaoVien ? ` · GV: ${mon.giaoVien.hoTen}` : ""}
           </p>
+          <form action={capNhatLoaiMon} className="mt-2 flex items-center gap-2">
+            <input type="hidden" name="id" value={mon.id} />
+            <label className="text-xs text-slate-500">Loại môn:</label>
+            <select
+              name="loaiMon"
+              defaultValue={mon.loaiMon}
+              className="rounded-md border border-slate-300 text-slate-700 text-xs px-2 py-1"
+            >
+              <option value="NGHE">Môn nghề</option>
+              <option value="VAN_HOA">Môn văn hóa/môn chung</option>
+            </select>
+            <button
+              type="submit"
+              className="text-xs font-medium text-slate-600 hover:underline"
+            >
+              Lưu
+            </button>
+          </form>
           {laAdmin && (
             <div className="mt-2">
               <GanGiaoVienInline
@@ -108,7 +126,9 @@ export default async function MonHocDetailPage(props: PageProps<"/chuong-trinh/[
             <p className="text-sm text-slate-500">
               {mon.mauGiaoAnTenFile
                 ? `Đang dùng mẫu: ${mon.mauGiaoAnTenFile}`
-                : "Chưa có mẫu riêng — AI sẽ soạn giáo án theo khung mặc định (Dẫn nhập, Giới thiệu chủ đề, Giải quyết vấn đề, Kết thúc vấn đề, Hướng dẫn tự học)."}
+                : mon.loaiMon === "VAN_HOA"
+                  ? "Chưa có mẫu riêng — AI sẽ soạn giáo án theo khung mặc định cho môn văn hóa (Khởi động, Hình thành kiến thức mới, Luyện tập, Vận dụng — theo Công văn 5512/BGDĐT-GDTrH)."
+                  : "Chưa có mẫu riêng — AI sẽ soạn giáo án theo khung mặc định cho môn nghề: Dẫn nhập, Giới thiệu chủ đề, Giải quyết vấn đề, Kết thúc vấn đề, Hướng dẫn tự học (buổi thuần thực hành sẽ tự chuyển sang khung Hướng dẫn ban đầu/thường xuyên/kết thúc)."}
             </p>
           </div>
         </div>

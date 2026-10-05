@@ -48,6 +48,22 @@ export default async function MonHocMoiPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
+              Loại môn học
+            </label>
+            <select
+              name="loaiMon"
+              defaultValue="NGHE"
+              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            >
+              <option value="NGHE">Môn nghề (lý thuyết/thực hành/tích hợp)</option>
+              <option value="VAN_HOA">Môn văn hóa/môn chung (Toán, Văn, Anh...)</option>
+            </select>
+            <p className="mt-1 text-xs text-slate-500">
+              Quyết định khung giáo án mặc định AI dùng khi môn chưa có mẫu riêng.
+            </p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
               Giáo viên phụ trách
             </label>
             {laAdmin ? (
