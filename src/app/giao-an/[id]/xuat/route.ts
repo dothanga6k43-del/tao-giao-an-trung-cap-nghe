@@ -15,7 +15,7 @@ import {
 } from "docx";
 import { prisma } from "@/lib/prisma";
 import { parseNoiDungGiaoAn } from "@/lib/giaoan/schema";
-import { layHangBangNoiDung } from "@/lib/giaoan/bang-noi-dung";
+import { layHangBangNoiDung, layThongTinDauBai } from "@/lib/giaoan/bang-noi-dung";
 import { layTaiKhoanHienTai } from "@/lib/auth/session";
 import { coQuyenVoiGiaoVien } from "@/lib/auth/pham-vi";
 
@@ -84,6 +84,7 @@ export async function GET(
 
   const noiDung = parseNoiDungGiaoAn(giaoAn.noiDungJson);
   const giaoVien = giaoAn.buoiDay.lichTrinh.giaoVien;
+  const tt = layThongTinDauBai(giaoAn.buoiDay);
 
   const hangKhungMuc = layHangBangNoiDung(noiDung).map(
     (h) =>
@@ -103,6 +104,35 @@ export async function GET(
       {
         properties: {},
         children: [
+          new Table({
+            width: { size: 100, type: WidthType.PERCENTAGE },
+            borders: {
+              top: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+              bottom: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+              left: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+              right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+              insideHorizontal: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+              insideVertical: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+            },
+            rows: [
+              new TableRow({
+                children: [
+                  new TableCell({
+                    width: { size: 50, type: WidthType.PERCENTAGE },
+                    children: [new Paragraph({ children: [oChu(`GIÁO ÁN SỐ: ${tt.giaoAnSo}`)] })],
+                  }),
+                  new TableCell({
+                    width: { size: 50, type: WidthType.PERCENTAGE },
+                    children: [
+                      new Paragraph({ children: [oChu(`Thời gian thực hiện: ${tt.thoiGianThucHien}`)] }),
+                    ],
+                  }),
+                ],
+              }),
+            ],
+          }),
+          oDoan(`Lớp dạy: ${tt.lopDay}`),
+          oDoan(`Thực hiện: ngày ${tt.ngay} tháng ${tt.thang} năm ${tt.nam}`),
           oDoan("Tên bài trình giảng:"),
           new Paragraph({
             alignment: AlignmentType.CENTER,

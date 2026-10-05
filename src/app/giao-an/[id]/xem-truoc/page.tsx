@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { parseNoiDungGiaoAn } from "@/lib/giaoan/schema";
-import { layHangBangNoiDung } from "@/lib/giaoan/bang-noi-dung";
+import { layHangBangNoiDung, layThongTinDauBai } from "@/lib/giaoan/bang-noi-dung";
 import TrangXemTruocWord from "@/components/TrangXemTruocWord";
 import { layTaiKhoanHienTai } from "@/lib/auth/session";
 import { yeuCauQuyenXem } from "@/lib/auth/pham-vi";
@@ -28,6 +28,7 @@ export default async function GiaoAnXemTruocPage(
   const noiDung = parseNoiDungGiaoAn(giaoAn.noiDungJson);
   const hang = layHangBangNoiDung(noiDung);
   const giaoVien = giaoAn.buoiDay.lichTrinh.giaoVien;
+  const tt = layThongTinDauBai(giaoAn.buoiDay);
 
   return (
     <TrangXemTruocWord
@@ -35,6 +36,14 @@ export default async function GiaoAnXemTruocPage(
       backLabel={giaoAn.tenBai}
       exportHref={`/giao-an/${giaoAn.id}/xuat`}
     >
+      <p>
+        GIÁO ÁN SỐ: {tt.giaoAnSo}
+        <span className="float-right">Thời gian thực hiện: {tt.thoiGianThucHien}</span>
+      </p>
+      <p>Lớp dạy: {tt.lopDay}</p>
+      <p>
+        Thực hiện: ngày {tt.ngay} tháng {tt.thang} năm {tt.nam}
+      </p>
       <p>Tên bài trình giảng:</p>
       <p className="text-center font-bold text-[15px] mt-2 mb-6 uppercase">
         {giaoAn.tenBai}

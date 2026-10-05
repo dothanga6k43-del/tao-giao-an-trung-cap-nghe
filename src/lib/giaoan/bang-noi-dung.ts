@@ -4,6 +4,41 @@
 
 import type { NoiDungGiaoAn } from "./schema";
 
+// Khung thong tin dau bai (GIAO AN SO, Thoi gian thuc hien, Lop day, Thuc
+// hien ngay...) - theo dung thu tu/nhan cua Mau so 5 (So giao an ly thuyet)
+// ban hanh kem Quyet dinh 62/2008/QD-BLDTBXH. Dung chung giua ban xuat Word
+// va ban xem truoc de hai noi khong bi lech nhau.
+export type ThongTinDauBai = {
+  giaoAnSo: number;
+  thoiGianThucHien: string;
+  lopDay: string;
+  ngay: number;
+  thang: number;
+  nam: number;
+};
+
+export function layThongTinDauBai(buoiDay: {
+  thuTu: number;
+  tongTiet: number;
+  ngayThucHien: Date;
+  lichTrinh: { soPhutMoiTiet: number; lop: { tenLop: string } };
+}): ThongTinDauBai {
+  const [nam, thang, ngay] = new Date(buoiDay.ngayThucHien)
+    .toISOString()
+    .slice(0, 10)
+    .split("-")
+    .map(Number);
+  const tongPhut = Math.round(buoiDay.tongTiet * buoiDay.lichTrinh.soPhutMoiTiet);
+  return {
+    giaoAnSo: buoiDay.thuTu,
+    thoiGianThucHien: `${buoiDay.tongTiet} tiết (${tongPhut} phút)`,
+    lopDay: buoiDay.lichTrinh.lop.tenLop,
+    ngay,
+    thang,
+    nam,
+  };
+}
+
 export type HangBangNoiDung = {
   stt: string;
   tieuDe: string;
