@@ -21,6 +21,7 @@ import {
   ClipboardList,
   RefreshCw,
   FileText,
+  Eye,
   Sparkles,
   Save,
   Unlock,
@@ -110,6 +111,15 @@ export default async function LichTrinhDetailPage(
             )}
             {daDuyet ? "Đã duyệt" : "Nháp"}
           </span>
+          {lichTrinh.buoiDay.length > 0 && (
+            <Link
+              href={`/lich-trinh/${lichTrinh.id}/xem-truoc`}
+              className="inline-flex items-center gap-1.5 text-sm rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-50"
+            >
+              <Eye className="h-4 w-4" strokeWidth={1.75} />
+              Xem trước
+            </Link>
+          )}
           {!daDuyet && (
             <form action={xoaLichTrinh}>
               <input type="hidden" name="id" value={lichTrinh.id} />

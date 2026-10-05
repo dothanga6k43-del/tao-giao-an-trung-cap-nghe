@@ -30,7 +30,7 @@ export default function Sidebar() {
 
   return (
     <>
-      <header className="md:hidden sticky top-0 z-30 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3">
+      <header className="no-print md:hidden sticky top-0 z-30 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3">
         <Link
           href="/"
           className="flex items-center gap-2 font-semibold text-slate-900"
@@ -58,7 +58,7 @@ export default function Sidebar() {
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 shrink-0 overflow-y-auto border-r border-slate-200 bg-white transition-transform duration-200 md:static md:z-auto md:min-h-screen md:translate-x-0 ${
+        className={`no-print fixed inset-y-0 left-0 z-50 w-64 shrink-0 overflow-y-auto border-r border-slate-200 bg-white transition-transform duration-200 md:static md:z-auto md:min-h-screen md:translate-x-0 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >

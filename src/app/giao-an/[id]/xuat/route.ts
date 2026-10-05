@@ -15,6 +15,7 @@ import {
 } from "docx";
 import { prisma } from "@/lib/prisma";
 import { parseNoiDungGiaoAn } from "@/lib/giaoan/schema";
+import { layHangBangNoiDung } from "@/lib/giaoan/bang-noi-dung";
 
 const O_BORDER = {
   top: { style: BorderStyle.SINGLE, size: 2, color: "999999" },
@@ -77,56 +78,18 @@ export async function GET(
   const noiDung = parseNoiDungGiaoAn(giaoAn.noiDungJson);
   const giaoVien = giaoAn.buoiDay.lichTrinh.giaoVien;
 
-  const hangCoDinh = (
-    stt: string,
-    tieuDe: string,
-    gv: string,
-    hs: string,
-    phut: number
-  ) =>
-    new TableRow({
-      children: [
-        oO(stt, { width: 6 }),
-        oO(tieuDe, { width: 30, bold: true }),
-        oO(gv, { width: 27 }),
-        oO(hs, { width: 27 }),
-        oO(`${phut} phút`, { width: 10 }),
-      ],
-    });
-
-  const hangKhungMuc = noiDung.khungMuc.flatMap((khung, idx) => {
-    const stt = String(idx + 1);
-    if (khung.items.length === 1) {
-      const m = khung.items[0];
-      return [
-        hangCoDinh(stt, m.tieuDe || khung.khungMucTieuDe, m.hoatDongGV, m.hoatDongHS, m.thoiGianPhut),
-      ];
-    }
-    const tongPhutKhung = khung.items.reduce((s, m) => s + m.thoiGianPhut, 0);
-    return [
+  const hangKhungMuc = layHangBangNoiDung(noiDung).map(
+    (h) =>
       new TableRow({
         children: [
-          oO(stt, { width: 6 }),
-          oO(khung.khungMucTieuDe, { width: 30, bold: true }),
-          oO("", { width: 27 }),
-          oO("", { width: 27 }),
-          oO(`${tongPhutKhung} phút`, { width: 10 }),
+          oO(h.stt, { width: 6 }),
+          oO(h.tieuDe, { width: 30, bold: h.boldTieuDe }),
+          oO(h.gv, { width: 27 }),
+          oO(h.hs, { width: 27 }),
+          oO(`${h.phut} phút`, { width: 10 }),
         ],
-      }),
-      ...khung.items.map(
-        (m) =>
-          new TableRow({
-            children: [
-              oO("", { width: 6 }),
-              oO(`${m.tieuDe}\n${m.noiDung}`, { width: 30 }),
-              oO(m.hoatDongGV, { width: 27 }),
-              oO(m.hoatDongHS, { width: 27 }),
-              oO(`${m.thoiGianPhut} phút`, { width: 10 }),
-            ],
-          })
-      ),
-    ];
-  });
+      })
+  );
 
   const doc = new Document({
     sections: [

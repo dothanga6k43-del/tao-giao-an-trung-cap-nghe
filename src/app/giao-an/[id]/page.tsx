@@ -15,6 +15,7 @@ import {
 import {
   ChevronLeft,
   FileDown,
+  Eye,
   Sparkles,
   Unlock,
   CheckCircle2,
@@ -88,6 +89,13 @@ export default async function GiaoAnDetailPage(
             )}
             {daHoanThien ? "Hoàn thiện" : "Nháp"}
           </span>
+          <Link
+            href={`/giao-an/${giaoAn.id}/xem-truoc`}
+            className="inline-flex items-center gap-1.5 text-sm rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-50"
+          >
+            <Eye className="h-4 w-4" strokeWidth={1.75} />
+            Xem trước
+          </Link>
           <a
             href={`/giao-an/${giaoAn.id}/xuat`}
             className="inline-flex items-center gap-1.5 text-sm rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-50"
