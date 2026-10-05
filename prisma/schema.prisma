@@ -22,6 +22,11 @@ enum TrangThaiGiaoAn {
   FINAL
 }
 
+enum VaiTro {
+  ADMIN
+  GIAO_VIEN
+}
+
 model GiaoVien {
   id            String   @id @default(cuid())
   hoTen         String
@@ -31,6 +36,34 @@ model GiaoVien {
 
   monHoc        MonHoc[]
   lichTrinh     LichTrinhGiangDay[]
+  taiKhoan      TaiKhoan?
+}
+
+// Tai khoan dang nhap. Co the gan voi 1 GiaoVien (tai khoan cua giao vien do)
+// hoac khong gan voi ai (tai khoan Admin doc lap).
+model TaiKhoan {
+  id              String   @id @default(cuid())
+  tenDangNhap     String   @unique
+  matKhauHash     String
+  vaiTro          VaiTro   @default(GIAO_VIEN)
+  giaoVienId      String?  @unique
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  giaoVien        GiaoVien? @relation(fields: [giaoVienId], references: [id], onDelete: Cascade)
+  phien           PhienDangNhap[]
+}
+
+// Phien dang nhap - luu ban bam (hash) cua token, cookie trinh duyet giu token
+// goc. Cho phep thu hoi phien (vd khi xoa tai khoan hoac dang xuat).
+model PhienDangNhap {
+  id            String   @id @default(cuid())
+  taiKhoanId    String
+  tokenHash     String   @unique
+  hetHan        DateTime
+  createdAt     DateTime @default(now())
+
+  taiKhoan      TaiKhoan @relation(fields: [taiKhoanId], references: [id], onDelete: Cascade)
 }
 
 model Lop {

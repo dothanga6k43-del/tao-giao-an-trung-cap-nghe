@@ -1,16 +1,29 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { taoGiaoVien, xoaGiaoVien } from "@/lib/actions/giao-vien";
-import { GraduationCap, Plus, Trash2, FileSpreadsheet, CheckCircle2 } from "lucide-react";
+import { layTaiKhoanHienTai } from "@/lib/auth/session";
+import {
+  GraduationCap,
+  Plus,
+  Trash2,
+  FileSpreadsheet,
+  CheckCircle2,
+  KeyRound,
+} from "lucide-react";
 
 export default async function GiaoVienPage(props: PageProps<"/giao-vien">) {
   const searchParams = await props.searchParams;
   const daThem = typeof searchParams.daThem === "string" ? Number(searchParams.daThem) : null;
   const boQua = typeof searchParams.boQua === "string" ? Number(searchParams.boQua) : 0;
 
-  const danhSach = await prisma.giaoVien.findMany({
-    orderBy: { hoTen: "asc" },
-  });
+  const [danhSach, hienTai] = await Promise.all([
+    prisma.giaoVien.findMany({
+      orderBy: { hoTen: "asc" },
+      include: { taiKhoan: { select: { id: true } } },
+    }),
+    layTaiKhoanHienTai(),
+  ]);
+  const laAdmin = hienTai?.vaiTro === "ADMIN";
 
   return (
     <div className="space-y-8">
@@ -92,16 +105,36 @@ export default async function GiaoVienPage(props: PageProps<"/giao-vien">) {
                 )}
               </div>
             </div>
-            <form action={xoaGiaoVien}>
-              <input type="hidden" name="id" value={gv.id} />
-              <button
-                type="submit"
-                className="inline-flex items-center gap-1.5 text-sm text-red-600 hover:underline"
-              >
-                <Trash2 className="h-4 w-4" strokeWidth={1.75} />
-                Xóa
-              </button>
-            </form>
+            <div className="flex items-center gap-3 shrink-0">
+              {gv.taiKhoan ? (
+                <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700">
+                  <KeyRound className="h-3.5 w-3.5" strokeWidth={2} />
+                  Có tài khoản
+                </span>
+              ) : laAdmin ? (
+                <Link
+                  href="/tai-khoan"
+                  className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 hover:bg-amber-200"
+                >
+                  <KeyRound className="h-3.5 w-3.5" strokeWidth={2} />
+                  Chưa có tài khoản
+                </Link>
+              ) : (
+                <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-amber-100 text-amber-700">
+                  Chưa có tài khoản
+                </span>
+              )}
+              <form action={xoaGiaoVien}>
+                <input type="hidden" name="id" value={gv.id} />
+                <button
+                  type="submit"
+                  className="inline-flex items-center gap-1.5 text-sm text-red-600 hover:underline"
+                >
+                  <Trash2 className="h-4 w-4" strokeWidth={1.75} />
+                  Xóa
+                </button>
+              </form>
+            </div>
           </div>
         ))}
       </div>
