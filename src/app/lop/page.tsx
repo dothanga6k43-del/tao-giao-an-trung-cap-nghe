@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { taoLop, xoaLop } from "@/lib/actions/lop";
+import { ganGiaoVienChoLop } from "@/lib/actions/gan-giao-vien";
 import { layTaiKhoanHienTai } from "@/lib/auth/session";
 import { dieuKienTheoGiaoVien } from "@/lib/auth/pham-vi";
+import GanGiaoVienInline from "@/components/GanGiaoVienInline";
 import { Users, Plus, Trash2, FileSpreadsheet, CheckCircle2 } from "lucide-react";
 
 export default async function LopPage(props: PageProps<"/lop">) {
@@ -11,10 +13,16 @@ export default async function LopPage(props: PageProps<"/lop">) {
   const boQua = typeof searchParams.boQua === "string" ? Number(searchParams.boQua) : 0;
 
   const hienTai = await layTaiKhoanHienTai();
-  const danhSach = await prisma.lop.findMany({
-    where: dieuKienTheoGiaoVien(hienTai),
-    orderBy: { tenLop: "asc" },
-  });
+  const laAdmin = hienTai?.vaiTro === "ADMIN";
+  const [danhSach, giaoVienOptions] = await Promise.all([
+    prisma.lop.findMany({
+      where: dieuKienTheoGiaoVien(hienTai),
+      orderBy: { tenLop: "asc" },
+    }),
+    laAdmin
+      ? prisma.giaoVien.findMany({ orderBy: { hoTen: "asc" } })
+      : Promise.resolve([]),
+  ]);
 
   return (
     <div className="space-y-8">
@@ -110,16 +118,27 @@ export default async function LopPage(props: PageProps<"/lop">) {
                 </p>
               </div>
             </div>
-            <form action={xoaLop}>
-              <input type="hidden" name="id" value={lop.id} />
-              <button
-                type="submit"
-                className="inline-flex items-center gap-1.5 text-sm text-red-600 hover:underline"
-              >
-                <Trash2 className="h-4 w-4" strokeWidth={1.75} />
-                Xóa
-              </button>
-            </form>
+            <div className="flex items-center gap-3 shrink-0">
+              {laAdmin && (
+                <GanGiaoVienInline
+                  key={lop.giaoVienId ?? "none"}
+                  id={lop.id}
+                  giaoVienHienTaiId={lop.giaoVienId}
+                  giaoVienOptions={giaoVienOptions}
+                  action={ganGiaoVienChoLop}
+                />
+              )}
+              <form action={xoaLop}>
+                <input type="hidden" name="id" value={lop.id} />
+                <button
+                  type="submit"
+                  className="inline-flex items-center gap-1.5 text-sm text-red-600 hover:underline"
+                >
+                  <Trash2 className="h-4 w-4" strokeWidth={1.75} />
+                  Xóa
+                </button>
+              </form>
+            </div>
           </div>
         ))}
       </div>

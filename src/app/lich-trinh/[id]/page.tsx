@@ -12,8 +12,10 @@ import {
   xoaLichTrinh,
 } from "@/lib/actions/lich-trinh";
 import { taoGiaoAnBangAI } from "@/lib/actions/giao-an";
+import { ganGiaoVienChoLichTrinh } from "@/lib/actions/gan-giao-vien";
 import { layTaiKhoanHienTai } from "@/lib/auth/session";
 import { yeuCauQuyenXem } from "@/lib/auth/pham-vi";
+import GanGiaoVienInline from "@/components/GanGiaoVienInline";
 import {
   ChevronLeft,
   Trash2,
@@ -77,6 +79,10 @@ export default async function LichTrinhDetailPage(
 
   const hienTai = await layTaiKhoanHienTai();
   yeuCauQuyenXem(hienTai, lichTrinh.giaoVienId);
+  const laAdmin = hienTai?.vaiTro === "ADMIN";
+  const giaoVienOptions = laAdmin
+    ? await prisma.giaoVien.findMany({ orderBy: { hoTen: "asc" } })
+    : [];
 
   const daDuyet = lichTrinh.trangThai === "APPROVED";
   const tongTietDaXep = lichTrinh.buoiDay.reduce((s, b) => s + b.tongTiet, 0);
@@ -95,11 +101,22 @@ export default async function LichTrinhDetailPage(
             {lichTrinh.monHoc.tenMonHoc} · {lichTrinh.lop.tenLop}
           </h1>
           <p className="text-sm text-slate-500 mt-1">
-            {lichTrinh.giaoVien ? `GV: ${lichTrinh.giaoVien.hoTen} · ` : ""}
+            {!laAdmin && lichTrinh.giaoVien ? `GV: ${lichTrinh.giaoVien.hoTen} · ` : ""}
             Bắt đầu {formatNgay(lichTrinh.ngayBatDau)} · {lichTrinh.soPhutMoiTiet}{" "}
             phút/tiết
             {lichTrinh.hocKy ? ` · ${lichTrinh.hocKy}` : ""}
           </p>
+          {laAdmin && (
+            <div className="mt-2">
+              <GanGiaoVienInline
+                key={lichTrinh.giaoVienId ?? "none"}
+                id={lichTrinh.id}
+                giaoVienHienTaiId={lichTrinh.giaoVienId}
+                giaoVienOptions={giaoVienOptions}
+                action={ganGiaoVienChoLichTrinh}
+              />
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-3">
           <span

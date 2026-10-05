@@ -3,8 +3,10 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { taoBaiHoc, xoaBaiHoc, xoaMonHoc } from "@/lib/actions/chuong-trinh";
 import { xoaMauGiaoAn } from "@/lib/actions/giao-an-mau";
+import { ganGiaoVienChoMonHoc } from "@/lib/actions/gan-giao-vien";
 import { layTaiKhoanHienTai } from "@/lib/auth/session";
 import { yeuCauQuyenXem } from "@/lib/auth/pham-vi";
+import GanGiaoVienInline from "@/components/GanGiaoVienInline";
 import {
   ChevronLeft,
   Trash2,
@@ -34,6 +36,10 @@ export default async function MonHocDetailPage(props: PageProps<"/chuong-trinh/[
 
   const hienTai = await layTaiKhoanHienTai();
   yeuCauQuyenXem(hienTai, mon.giaoVienId);
+  const laAdmin = hienTai?.vaiTro === "ADMIN";
+  const giaoVienOptions = laAdmin
+    ? await prisma.giaoVien.findMany({ orderBy: { hoTen: "asc" } })
+    : [];
 
   const tongGioBai = mon.baiHoc.reduce((s, b) => s + b.tongSoGio, 0);
 
@@ -67,8 +73,20 @@ export default async function MonHocDetailPage(props: PageProps<"/chuong-trinh/[
           </h1>
           <p className="text-sm text-slate-500 mt-1">
             {mon.tongSoGio} giờ (LT {mon.lyThuyetGio} · TH {mon.thucHanhGio} · KT{" "}
-            {mon.kiemTraGio}){mon.giaoVien ? ` · GV: ${mon.giaoVien.hoTen}` : ""}
+            {mon.kiemTraGio})
+            {!laAdmin && mon.giaoVien ? ` · GV: ${mon.giaoVien.hoTen}` : ""}
           </p>
+          {laAdmin && (
+            <div className="mt-2">
+              <GanGiaoVienInline
+                key={mon.giaoVienId ?? "none"}
+                id={mon.id}
+                giaoVienHienTaiId={mon.giaoVienId}
+                giaoVienOptions={giaoVienOptions}
+                action={ganGiaoVienChoMonHoc}
+              />
+            </div>
+          )}
         </div>
         <form action={xoaMonHoc}>
           <input type="hidden" name="id" value={mon.id} />

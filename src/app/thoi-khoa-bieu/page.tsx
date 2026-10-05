@@ -1,16 +1,24 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { ganGiaoVienChoThoiKhoaBieu } from "@/lib/actions/gan-giao-vien";
 import { layTaiKhoanHienTai } from "@/lib/auth/session";
 import { dieuKienTheoGiaoVien } from "@/lib/auth/pham-vi";
+import GanGiaoVienInline from "@/components/GanGiaoVienInline";
 import { CalendarDays, Plus, ChevronRight } from "lucide-react";
 
 export default async function ThoiKhoaBieuListPage() {
   const hienTai = await layTaiKhoanHienTai();
-  const danhSach = await prisma.thoiKhoaBieu.findMany({
-    where: dieuKienTheoGiaoVien(hienTai),
-    orderBy: { createdAt: "desc" },
-    include: { _count: { select: { dong: true } } },
-  });
+  const laAdmin = hienTai?.vaiTro === "ADMIN";
+  const [danhSach, giaoVienOptions] = await Promise.all([
+    prisma.thoiKhoaBieu.findMany({
+      where: dieuKienTheoGiaoVien(hienTai),
+      orderBy: { createdAt: "desc" },
+      include: { _count: { select: { dong: true } } },
+    }),
+    laAdmin
+      ? prisma.giaoVien.findMany({ orderBy: { hoTen: "asc" } })
+      : Promise.resolve([]),
+  ]);
 
   return (
     <div className="space-y-8">
@@ -45,12 +53,11 @@ export default async function ThoiKhoaBieuListPage() {
           </div>
         )}
         {danhSach.map((tkb) => (
-          <Link
-            key={tkb.id}
-            href={`/thoi-khoa-bieu/${tkb.id}`}
-            className="flex items-center justify-between gap-3 p-4 hover:bg-slate-50"
-          >
-            <div className="flex items-start gap-3">
+          <div key={tkb.id} className="flex items-center justify-between gap-3 p-4">
+            <Link
+              href={`/thoi-khoa-bieu/${tkb.id}`}
+              className="flex flex-1 min-w-0 items-start gap-3 hover:opacity-80"
+            >
               <CalendarDays className="mt-0.5 h-5 w-5 shrink-0 text-slate-400" strokeWidth={1.75} />
               <div>
                 <p className="font-medium text-slate-900">{tkb.tieuDe}</p>
@@ -62,9 +69,22 @@ export default async function ThoiKhoaBieuListPage() {
                   {tkb._count.dong} dòng
                 </p>
               </div>
+            </Link>
+            <div className="flex items-center gap-3 shrink-0">
+              {laAdmin && (
+                <GanGiaoVienInline
+                  key={tkb.giaoVienId ?? "none"}
+                  id={tkb.id}
+                  giaoVienHienTaiId={tkb.giaoVienId}
+                  giaoVienOptions={giaoVienOptions}
+                  action={ganGiaoVienChoThoiKhoaBieu}
+                />
+              )}
+              <Link href={`/thoi-khoa-bieu/${tkb.id}`}>
+                <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" strokeWidth={2} />
+              </Link>
             </div>
-            <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" strokeWidth={2} />
-          </Link>
+          </div>
         ))}
       </div>
     </div>
