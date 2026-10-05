@@ -114,7 +114,13 @@ type ThongTinLoi = {
 };
 
 async function trichXuatThongTinLoi(html: string): Promise<ThongTinLoi> {
-  const prompt = `Đây là nội dung trích xuất từ file "Chương trình môn học" (Word hoặc Excel) theo mẫu đào tạo trung cấp nghề Việt Nam. Chỉ trích xuất: tên môn học, mã môn học, tổng số giờ (và LT/TH/KT), và danh sách các bài từ bảng "Nội dung tổng quát và phân phối thời gian" (tên bài, số giờ mỗi bài). KHÔNG cần các đoạn văn bản dài như mục tiêu/điều kiện thực hiện/tài liệu tham khảo, và KHÔNG cần nội dung chi tiết (1., 1.1...) của từng bài. Gọi công cụ ${TEN_CONG_CU_LOI}.
+  const prompt = `Đây là nội dung trích xuất từ file "Chương trình môn học/mô đun" (Word hoặc Excel) theo mẫu đào tạo trung cấp nghề Việt Nam. Chỉ trích xuất: tên môn học/mô đun, mã số, tổng số giờ (và LT/TH/KT), và danh sách các bài (tên bài, số giờ mỗi bài). KHÔNG cần các đoạn văn bản dài như mục tiêu/điều kiện thực hiện/tài liệu tham khảo, và KHÔNG cần nội dung chi tiết (1., 1.1...) của từng bài.
+
+Danh sách các bài có thể nằm ở MỘT trong hai dạng sau (tùy file, không phải lúc nào cũng có cả hai):
+- Dạng có bảng tổng quát riêng: bảng "Nội dung tổng quát và phân phối thời gian" (hoặc tên tương tự), liệt kê TT/Tên bài/Tổng số/LT/TH/KT.
+- Dạng không có bảng tổng quát (thường gặp ở chương trình mô đun): các bài được liệt kê trực tiếp dưới mục "Nội dung môn học"/"Nội dung mô đun" dạng tiêu đề "Bài 1: ...", "Bài 2: ..." kèm "Thời gian: X giờ" ngay trên tiêu đề - hãy lấy tên bài và tổng số giờ từ chính các tiêu đề này. Nếu không có số giờ LT/TH/KT riêng cho từng bài, chia tỉ lệ hợp lý theo tổng LT/TH/KT của toàn môn/mô đun, hoặc để 0 nếu không đủ căn cứ - KHÔNG được bỏ sót bài nào.
+
+Gọi công cụ ${TEN_CONG_CU_LOI}.
 
 Lưu ý: nếu đoạn mô tả chi tiết từng bài ("Thời gian: Xh (LT: Yh; TH: Zh)") có số khác với bảng tổng quát, ưu tiên đoạn mô tả chi tiết.
 
@@ -261,7 +267,7 @@ async function trichXuatChiTietMotBai(
   html: string,
   tenBai: string
 ): Promise<NoiDungMucTrichXuat[]> {
-  const prompt = `Đây là nội dung trích xuất từ file "Chương trình môn học" (Word hoặc Excel). Trong phần "Nội dung chi tiết", hãy tìm đúng phần của bài có tên "${tenBai}" và trích xuất TOÀN BỘ đề mục phân cấp (dạng 1., 1.1., 1.2...) của RIÊNG bài này, gọi công cụ ${TEN_CONG_CU_CHI_TIET}. Bỏ qua nội dung chi tiết của các bài khác.
+  const prompt = `Đây là nội dung trích xuất từ file "Chương trình môn học/mô đun" (Word hoặc Excel). Dù file có mục riêng gọi là "Nội dung chi tiết" hay không (có file gộp chung phần tổng quát và chi tiết trong một mục như "Nội dung môn học"/"Nội dung mô đun"), hãy tìm đúng phần nội dung của bài có tên "${tenBai}" và trích xuất TOÀN BỘ đề mục phân cấp (dạng 1., 1.1., 1.2... hoặc 2.1., 2.1.1...) của RIÊNG bài này, gọi công cụ ${TEN_CONG_CU_CHI_TIET}. Bỏ qua nội dung chi tiết của các bài khác.
 
 Yêu cầu:
 - Giữ nguyên văn bản tiếng Việt.
