@@ -1,9 +1,14 @@
 import { prisma } from "@/lib/prisma";
 import { taoMonHoc } from "@/lib/actions/chuong-trinh";
+import { layTaiKhoanHienTai } from "@/lib/auth/session";
 import { BookOpenText, Save } from "lucide-react";
 
 export default async function MonHocMoiPage() {
-  const giaoVien = await prisma.giaoVien.findMany({ orderBy: { hoTen: "asc" } });
+  const hienTai = await layTaiKhoanHienTai();
+  const laAdmin = hienTai?.vaiTro === "ADMIN";
+  const giaoVien = laAdmin
+    ? await prisma.giaoVien.findMany({ orderBy: { hoTen: "asc" } })
+    : [];
 
   return (
     <div className="space-y-6 max-w-3xl">
@@ -45,17 +50,23 @@ export default async function MonHocMoiPage() {
             <label className="block text-sm font-medium text-slate-700 mb-1">
               Giáo viên phụ trách
             </label>
-            <select
-              name="giaoVienId"
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-            >
-              <option value="">-- Chưa chọn --</option>
-              {giaoVien.map((gv) => (
-                <option key={gv.id} value={gv.id}>
-                  {gv.hoTen}
-                </option>
-              ))}
-            </select>
+            {laAdmin ? (
+              <select
+                name="giaoVienId"
+                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+              >
+                <option value="">-- Chưa chọn --</option>
+                {giaoVien.map((gv) => (
+                  <option key={gv.id} value={gv.id}>
+                    {gv.hoTen}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <p className="text-sm text-slate-500 px-3 py-2 rounded-md bg-slate-50 border border-slate-200">
+                {hienTai?.giaoVienHoTen ?? "Bạn"} (môn học sẽ chỉ hiển thị với bạn)
+              </p>
+            )}
           </div>
         </div>
 

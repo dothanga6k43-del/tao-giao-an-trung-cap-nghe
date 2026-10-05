@@ -16,6 +16,8 @@ import {
 import { prisma } from "@/lib/prisma";
 import { parseNoiDungGiaoAn } from "@/lib/giaoan/schema";
 import { layHangBangNoiDung } from "@/lib/giaoan/bang-noi-dung";
+import { layTaiKhoanHienTai } from "@/lib/auth/session";
+import { coQuyenVoiGiaoVien } from "@/lib/auth/pham-vi";
 
 const O_BORDER = {
   top: { style: BorderStyle.SINGLE, size: 2, color: "999999" },
@@ -72,6 +74,11 @@ export async function GET(
   });
 
   if (!giaoAn) {
+    return new Response("Không tìm thấy giáo án", { status: 404 });
+  }
+
+  const hienTai = await layTaiKhoanHienTai();
+  if (!coQuyenVoiGiaoVien(hienTai, giaoAn.buoiDay.lichTrinh.giaoVienId)) {
     return new Response("Không tìm thấy giáo án", { status: 404 });
   }
 

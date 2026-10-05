@@ -10,6 +10,8 @@ import {
   type LopTuExcel,
 } from "@/lib/giaovien-lop/import";
 import { dienGiaiLoiAI } from "@/lib/dien-giai-loi-ai";
+import { layTaiKhoanHienTai } from "@/lib/auth/session";
+import { dieuKienTheoGiaoVien, giaoVienIdKhiTao } from "@/lib/auth/pham-vi";
 
 export type TrangThaiPhanTichGiaoVien = {
   data: GiaoVienTuExcel[] | null;
@@ -107,7 +109,15 @@ export async function luuLopTuFile(formData: FormData) {
   if (!raw) throw new Error("Không có dữ liệu để lưu");
   const data = JSON.parse(raw) as LopTuExcel[];
 
-  const hienCo = await prisma.lop.findMany({ select: { tenLop: true } });
+  const hienTai = await layTaiKhoanHienTai();
+  const giaoVienId = giaoVienIdKhiTao(hienTai, null);
+
+  // "Trung" nghia la trung voi lop CUA CHINH TAI KHOAN NAY - tranh truong hop
+  // bi bo qua vi trung ten voi lop cua giao vien khac (ma minh khong thay duoc).
+  const hienCo = await prisma.lop.findMany({
+    where: dieuKienTheoGiaoVien(hienTai),
+    select: { tenLop: true },
+  });
   const tenHienCo = new Set(hienCo.map((l) => l.tenLop.trim().toLowerCase()));
 
   const moi = data.filter((l) => !tenHienCo.has(l.tenLop.trim().toLowerCase()));
@@ -115,7 +125,7 @@ export async function luuLopTuFile(formData: FormData) {
 
   if (moi.length > 0) {
     await prisma.lop.createMany({
-      data: moi.map((l) => ({ tenLop: l.tenLop, khoa: l.khoa, namThu: l.namThu })),
+      data: moi.map((l) => ({ tenLop: l.tenLop, khoa: l.khoa, namThu: l.namThu, giaoVienId })),
     });
   }
 

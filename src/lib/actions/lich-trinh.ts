@@ -4,13 +4,22 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { sinhLichTrinh, type MucChiTiet, type KhungTiet } from "@/lib/lichtrinh/generate";
+import { layTaiKhoanHienTai } from "@/lib/auth/session";
+import { giaoVienIdKhiTao, yeuCauQuyenSua } from "@/lib/auth/pham-vi";
 
 const THU_LIST = [2, 3, 4, 5, 6, 7] as const;
+
+async function yeuCauQuyenVoiLichTrinh(lichTrinhId: string) {
+  const hienTai = await layTaiKhoanHienTai();
+  const lt = await prisma.lichTrinhGiangDay.findUniqueOrThrow({
+    where: { id: lichTrinhId },
+  });
+  yeuCauQuyenSua(hienTai, lt.giaoVienId);
+}
 
 export async function taoLichTrinh(formData: FormData) {
   const lopId = String(formData.get("lopId") ?? "");
   const monHocId = String(formData.get("monHocId") ?? "");
-  const giaoVienId = String(formData.get("giaoVienId") ?? "").trim() || null;
   const hocKy = String(formData.get("hocKy") ?? "").trim() || null;
   const ngayBatDauRaw = String(formData.get("ngayBatDau") ?? "");
   const soPhutMoiTiet = Number(formData.get("soPhutMoiTiet") ?? 45) || 45;
@@ -18,6 +27,10 @@ export async function taoLichTrinh(formData: FormData) {
   if (!lopId || !monHocId || !ngayBatDauRaw) {
     throw new Error("Vui lòng chọn lớp, môn học và ngày bắt đầu");
   }
+
+  const hienTai = await layTaiKhoanHienTai();
+  const giaoVienIdDaChon = String(formData.get("giaoVienId") ?? "").trim() || null;
+  const giaoVienId = giaoVienIdKhiTao(hienTai, giaoVienIdDaChon);
 
   const khungTietTuan = THU_LIST.map((thu) => {
     const tietBatDau = String(formData.get(`tiet_batdau_${thu}`) ?? "").trim();
@@ -52,6 +65,7 @@ export async function themNgayNghi(formData: FormData) {
   const ngay = String(formData.get("ngay") ?? "");
   const ghiChu = String(formData.get("ghiChu") ?? "").trim() || null;
   if (!ngay) throw new Error("Vui lòng chọn ngày nghỉ");
+  await yeuCauQuyenVoiLichTrinh(lichTrinhId);
 
   await prisma.ngayNghi.create({
     data: { lichTrinhId, ngay: new Date(ngay), ghiChu },
@@ -62,12 +76,16 @@ export async function themNgayNghi(formData: FormData) {
 export async function xoaNgayNghi(formData: FormData) {
   const id = String(formData.get("id"));
   const lichTrinhId = String(formData.get("lichTrinhId"));
+  await yeuCauQuyenVoiLichTrinh(lichTrinhId);
+
   await prisma.ngayNghi.delete({ where: { id } });
   revalidatePath(`/lich-trinh/${lichTrinhId}`);
 }
 
 export async function xoaLichTrinh(formData: FormData) {
   const id = String(formData.get("id"));
+  await yeuCauQuyenVoiLichTrinh(id);
+
   await prisma.lichTrinhGiangDay.delete({ where: { id } });
   revalidatePath("/lich-trinh");
   redirect("/lich-trinh");
@@ -75,6 +93,7 @@ export async function xoaLichTrinh(formData: FormData) {
 
 export async function sinhBuoiDay(formData: FormData) {
   const lichTrinhId = String(formData.get("lichTrinhId"));
+  await yeuCauQuyenVoiLichTrinh(lichTrinhId);
 
   const lichTrinh = await prisma.lichTrinhGiangDay.findUniqueOrThrow({
     where: { id: lichTrinhId },
@@ -175,6 +194,7 @@ export async function suaBuoiDay(formData: FormData) {
   const ngayThucHien = String(formData.get("ngayThucHien") ?? "");
   const thietBi = String(formData.get("thietBi") ?? "").trim() || null;
   const ghiChu = String(formData.get("ghiChu") ?? "").trim() || null;
+  await yeuCauQuyenVoiLichTrinh(lichTrinhId);
 
   await prisma.buoiDay.update({
     where: { id },
@@ -190,12 +210,16 @@ export async function suaBuoiDay(formData: FormData) {
 export async function xoaBuoiDay(formData: FormData) {
   const id = String(formData.get("id"));
   const lichTrinhId = String(formData.get("lichTrinhId"));
+  await yeuCauQuyenVoiLichTrinh(lichTrinhId);
+
   await prisma.buoiDay.delete({ where: { id } });
   revalidatePath(`/lich-trinh/${lichTrinhId}`);
 }
 
 export async function duyetLichTrinh(formData: FormData) {
   const id = String(formData.get("id"));
+  await yeuCauQuyenVoiLichTrinh(id);
+
   await prisma.lichTrinhGiangDay.update({
     where: { id },
     data: { trangThai: "APPROVED" },
@@ -205,6 +229,8 @@ export async function duyetLichTrinh(formData: FormData) {
 
 export async function moDuyetLaiLichTrinh(formData: FormData) {
   const id = String(formData.get("id"));
+  await yeuCauQuyenVoiLichTrinh(id);
+
   await prisma.lichTrinhGiangDay.update({
     where: { id },
     data: { trangThai: "DRAFT" },

@@ -12,6 +12,8 @@ import {
   moLaiGiaoAn,
   xoaGiaoAn,
 } from "@/lib/actions/giao-an";
+import { layTaiKhoanHienTai } from "@/lib/auth/session";
+import { yeuCauQuyenXem } from "@/lib/auth/pham-vi";
 import {
   ChevronLeft,
   FileDown,
@@ -46,6 +48,9 @@ export default async function GiaoAnDetailPage(
   });
 
   if (!giaoAn) notFound();
+
+  const hienTai = await layTaiKhoanHienTai();
+  yeuCauQuyenXem(hienTai, giaoAn.buoiDay.lichTrinh.giaoVienId);
 
   const noiDung = parseNoiDungGiaoAn(giaoAn.noiDungJson);
   const tongPhutSoan = tongPhutNoiDung(noiDung);

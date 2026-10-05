@@ -1,9 +1,13 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { layTaiKhoanHienTai } from "@/lib/auth/session";
+import { dieuKienTheoGiaoVien } from "@/lib/auth/pham-vi";
 import { CalendarDays, Plus, ChevronRight } from "lucide-react";
 
 export default async function ThoiKhoaBieuListPage() {
+  const hienTai = await layTaiKhoanHienTai();
   const danhSach = await prisma.thoiKhoaBieu.findMany({
+    where: dieuKienTheoGiaoVien(hienTai),
     orderBy: { createdAt: "desc" },
     include: { _count: { select: { dong: true } } },
   });

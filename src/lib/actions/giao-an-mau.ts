@@ -9,6 +9,8 @@ import {
 } from "@/lib/giaoanmau/import";
 import type { KhungMucMau } from "@/lib/giaoan/schema";
 import { dienGiaiLoiAI } from "@/lib/dien-giai-loi-ai";
+import { layTaiKhoanHienTai } from "@/lib/auth/session";
+import { yeuCauQuyenSua } from "@/lib/auth/pham-vi";
 
 export type TrangThaiPhanTichMau = {
   data: KhungMucMau[] | null;
@@ -54,6 +56,10 @@ export async function luuMauGiaoAn(formData: FormData) {
   if (!monHocId) throw new Error("Thiếu môn học");
   if (!raw) throw new Error("Không có dữ liệu để lưu");
 
+  const hienTai = await layTaiKhoanHienTai();
+  const mon = await prisma.monHoc.findUniqueOrThrow({ where: { id: monHocId } });
+  yeuCauQuyenSua(hienTai, mon.giaoVienId);
+
   const khungMuc = JSON.parse(raw) as KhungMucMau[];
 
   await prisma.monHoc.update({
@@ -71,6 +77,10 @@ export async function luuMauGiaoAn(formData: FormData) {
 export async function xoaMauGiaoAn(formData: FormData) {
   const monHocId = String(formData.get("monHocId") ?? "");
   if (!monHocId) throw new Error("Thiếu môn học");
+
+  const hienTai = await layTaiKhoanHienTai();
+  const mon = await prisma.monHoc.findUniqueOrThrow({ where: { id: monHocId } });
+  yeuCauQuyenSua(hienTai, mon.giaoVienId);
 
   await prisma.monHoc.update({
     where: { id: monHocId },

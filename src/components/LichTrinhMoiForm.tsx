@@ -43,11 +43,13 @@ export default function LichTrinhMoiForm({
   monHoc,
   giaoVien,
   thoiKhoaBieu,
+  tenHienTaiNeuKhongPhaiAdmin,
 }: {
   lop: { id: string; tenLop: string }[];
   monHoc: { id: string; tenMonHoc: string; tongSoGio: number }[];
   giaoVien: { id: string; hoTen: string }[];
   thoiKhoaBieu: ThoiKhoaBieuOption[];
+  tenHienTaiNeuKhongPhaiAdmin?: string | null;
 }) {
   const [tkbId, setTkbId] = useState("");
   const [tkbLop, setTkbLop] = useState("");
@@ -157,17 +159,23 @@ export default function LichTrinhMoiForm({
           <label className="block text-sm font-medium text-slate-700 mb-1">
             Giáo viên
           </label>
-          <select
-            name="giaoVienId"
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-          >
-            <option value="">-- Chưa chọn --</option>
-            {giaoVien.map((gv) => (
-              <option key={gv.id} value={gv.id}>
-                {gv.hoTen}
-              </option>
-            ))}
-          </select>
+          {tenHienTaiNeuKhongPhaiAdmin !== undefined ? (
+            <p className="text-sm text-slate-500 px-3 py-2 rounded-md bg-slate-50 border border-slate-200">
+              {tenHienTaiNeuKhongPhaiAdmin ?? "Bạn"} (lịch trình sẽ chỉ hiển thị với bạn)
+            </p>
+          ) : (
+            <select
+              name="giaoVienId"
+              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            >
+              <option value="">-- Chưa chọn --</option>
+              {giaoVien.map((gv) => (
+                <option key={gv.id} value={gv.id}>
+                  {gv.hoTen}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">

@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { layTaiKhoanHienTai } from "@/lib/auth/session";
+import { dieuKienTheoGiaoVien } from "@/lib/auth/pham-vi";
 import { ClipboardList, Plus, CheckCircle2, PencilLine } from "lucide-react";
 
 const TRANG_THAI_LABEL: Record<string, string> = {
@@ -13,7 +15,9 @@ const TRANG_THAI_ICON: Record<string, typeof CheckCircle2> = {
 };
 
 export default async function LichTrinhListPage() {
+  const hienTai = await layTaiKhoanHienTai();
   const danhSach = await prisma.lichTrinhGiangDay.findMany({
+    where: dieuKienTheoGiaoVien(hienTai),
     orderBy: { createdAt: "desc" },
     include: { lop: true, monHoc: true, giaoVien: true, buoiDay: true },
   });

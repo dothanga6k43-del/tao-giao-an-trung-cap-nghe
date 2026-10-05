@@ -18,8 +18,10 @@ const LOAI_LABEL: Record<string, string> = {
 
 export default function NhapChuongTrinhForm({
   giaoVien,
+  tenHienTaiNeuKhongPhaiAdmin,
 }: {
   giaoVien: { id: string; hoTen: string }[];
+  tenHienTaiNeuKhongPhaiAdmin?: string | null;
 }) {
   const [state, formAction, pending] = useActionState(
     phanTichFileWord,
@@ -72,7 +74,11 @@ export default function NhapChuongTrinhForm({
       )}
 
       {state.data && (
-        <XemTruocVaLuu data={state.data} giaoVien={giaoVien} />
+        <XemTruocVaLuu
+          data={state.data}
+          giaoVien={giaoVien}
+          tenHienTaiNeuKhongPhaiAdmin={tenHienTaiNeuKhongPhaiAdmin}
+        />
       )}
     </div>
   );
@@ -81,9 +87,11 @@ export default function NhapChuongTrinhForm({
 function XemTruocVaLuu({
   data,
   giaoVien,
+  tenHienTaiNeuKhongPhaiAdmin,
 }: {
   data: NonNullable<TrangThaiPhanTich["data"]>;
   giaoVien: { id: string; hoTen: string }[];
+  tenHienTaiNeuKhongPhaiAdmin?: string | null;
 }) {
   return (
     <div className="space-y-6">
@@ -158,17 +166,23 @@ function XemTruocVaLuu({
           <label className="block text-sm font-medium text-slate-700 mb-1">
             Giáo viên phụ trách
           </label>
-          <select
-            name="giaoVienId"
-            className="w-full max-w-sm rounded-md border border-slate-300 px-3 py-2 text-sm"
-          >
-            <option value="">-- Chưa chọn --</option>
-            {giaoVien.map((gv) => (
-              <option key={gv.id} value={gv.id}>
-                {gv.hoTen}
-              </option>
-            ))}
-          </select>
+          {tenHienTaiNeuKhongPhaiAdmin !== undefined ? (
+            <p className="text-sm text-slate-500 px-3 py-2 rounded-md bg-slate-50 border border-slate-200 max-w-sm">
+              {tenHienTaiNeuKhongPhaiAdmin ?? "Bạn"} (môn học sẽ chỉ hiển thị với bạn)
+            </p>
+          ) : (
+            <select
+              name="giaoVienId"
+              className="w-full max-w-sm rounded-md border border-slate-300 px-3 py-2 text-sm"
+            >
+              <option value="">-- Chưa chọn --</option>
+              {giaoVien.map((gv) => (
+                <option key={gv.id} value={gv.id}>
+                  {gv.hoTen}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
         <button
           type="submit"

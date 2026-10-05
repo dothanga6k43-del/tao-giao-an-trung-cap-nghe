@@ -1,13 +1,18 @@
 import { prisma } from "@/lib/prisma";
 import LichTrinhMoiForm from "@/components/LichTrinhMoiForm";
+import { layTaiKhoanHienTai } from "@/lib/auth/session";
+import { dieuKienTheoGiaoVien } from "@/lib/auth/pham-vi";
 import { ClipboardList } from "lucide-react";
 
 export default async function LichTrinhMoiPage() {
+  const hienTai = await layTaiKhoanHienTai();
+  const dieuKien = dieuKienTheoGiaoVien(hienTai);
   const [lop, monHoc, giaoVien, thoiKhoaBieu] = await Promise.all([
-    prisma.lop.findMany({ orderBy: { tenLop: "asc" } }),
-    prisma.monHoc.findMany({ orderBy: { tenMonHoc: "asc" } }),
+    prisma.lop.findMany({ where: dieuKien, orderBy: { tenLop: "asc" } }),
+    prisma.monHoc.findMany({ where: dieuKien, orderBy: { tenMonHoc: "asc" } }),
     prisma.giaoVien.findMany({ orderBy: { hoTen: "asc" } }),
     prisma.thoiKhoaBieu.findMany({
+      where: dieuKien,
       orderBy: { createdAt: "desc" },
       include: {
         dong: {
@@ -35,6 +40,9 @@ export default async function LichTrinhMoiPage() {
         monHoc={monHoc}
         giaoVien={giaoVien}
         thoiKhoaBieu={thoiKhoaBieu}
+        tenHienTaiNeuKhongPhaiAdmin={
+          hienTai?.vaiTro === "ADMIN" ? undefined : (hienTai?.giaoVienHoTen ?? null)
+        }
       />
     </div>
   );

@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { taoBaiHoc, xoaBaiHoc, xoaMonHoc } from "@/lib/actions/chuong-trinh";
 import { xoaMauGiaoAn } from "@/lib/actions/giao-an-mau";
+import { layTaiKhoanHienTai } from "@/lib/auth/session";
+import { yeuCauQuyenXem } from "@/lib/auth/pham-vi";
 import {
   ChevronLeft,
   Trash2,
@@ -29,6 +31,9 @@ export default async function MonHocDetailPage(props: PageProps<"/chuong-trinh/[
   });
 
   if (!mon) notFound();
+
+  const hienTai = await layTaiKhoanHienTai();
+  yeuCauQuyenXem(hienTai, mon.giaoVienId);
 
   const tongGioBai = mon.baiHoc.reduce((s, b) => s + b.tongSoGio, 0);
 

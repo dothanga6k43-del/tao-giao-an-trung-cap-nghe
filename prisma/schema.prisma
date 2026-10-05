@@ -36,6 +36,8 @@ model GiaoVien {
 
   monHoc        MonHoc[]
   lichTrinh     LichTrinhGiangDay[]
+  lop           Lop[]
+  thoiKhoaBieu  ThoiKhoaBieu[]
   taiKhoan      TaiKhoan?
 }
 
@@ -71,9 +73,11 @@ model Lop {
   tenLop        String
   khoa          String?
   namThu        Int?
+  giaoVienId    String?  // nguoi tao (de phan quyen xem theo giao vien)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
+  giaoVien      GiaoVien? @relation(fields: [giaoVienId], references: [id], onDelete: SetNull)
   lichTrinh     LichTrinhGiangDay[]
 }
 
@@ -224,9 +228,11 @@ model ThoiKhoaBieu {
   ngayBatDau    DateTime?
   ngayKetThuc   DateTime?
   buoiHoc       String?
+  giaoVienId    String?  // nguoi tao (de phan quyen xem theo giao vien)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
+  giaoVien      GiaoVien? @relation(fields: [giaoVienId], references: [id], onDelete: SetNull)
   dong          ThoiKhoaBieuDong[]
 }
 

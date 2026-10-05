@@ -11,6 +11,8 @@ import {
   type ThoiKhoaBieuTrichXuat,
 } from "@/lib/thoikhoabieu/import";
 import { dienGiaiLoiAI } from "@/lib/dien-giai-loi-ai";
+import { layTaiKhoanHienTai } from "@/lib/auth/session";
+import { giaoVienIdKhiTao, yeuCauQuyenSua } from "@/lib/auth/pham-vi";
 
 export type TrangThaiPhanTichTKB = {
   data: ThoiKhoaBieuTrichXuat | null;
@@ -85,6 +87,8 @@ export async function luuThoiKhoaBieuTuFile(formData: FormData) {
   if (!raw) throw new Error("Không có dữ liệu để lưu");
 
   const data = JSON.parse(raw) as ThoiKhoaBieuTrichXuat;
+  const hienTai = await layTaiKhoanHienTai();
+  const giaoVienId = giaoVienIdKhiTao(hienTai, null);
 
   const id = await prisma.$transaction(async (tx) => {
     const tkb = await tx.thoiKhoaBieu.create({
@@ -94,6 +98,7 @@ export async function luuThoiKhoaBieuTuFile(formData: FormData) {
         ngayBatDau: data.ngayBatDau ? new Date(data.ngayBatDau) : null,
         ngayKetThuc: data.ngayKetThuc ? new Date(data.ngayKetThuc) : null,
         buoiHoc: data.buoiHoc,
+        giaoVienId,
       },
     });
 
@@ -128,6 +133,11 @@ export async function luuThoiKhoaBieuTuFile(formData: FormData) {
 export async function xoaThoiKhoaBieu(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   if (!id) throw new Error("Thiếu id");
+
+  const hienTai = await layTaiKhoanHienTai();
+  const tkb = await prisma.thoiKhoaBieu.findUniqueOrThrow({ where: { id } });
+  yeuCauQuyenSua(hienTai, tkb.giaoVienId);
+
   await prisma.thoiKhoaBieu.delete({ where: { id } });
   revalidatePath("/thoi-khoa-bieu");
   revalidatePath("/lich-trinh/moi");

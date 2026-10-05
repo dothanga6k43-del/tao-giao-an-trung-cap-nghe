@@ -1,12 +1,17 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import NhapChuongTrinhForm from "@/components/NhapChuongTrinhForm";
+import { layTaiKhoanHienTai } from "@/lib/auth/session";
 import { ChevronLeft } from "lucide-react";
 
 export const maxDuration = 60;
 
 export default async function NhapFilePage() {
-  const giaoVien = await prisma.giaoVien.findMany({ orderBy: { hoTen: "asc" } });
+  const hienTai = await layTaiKhoanHienTai();
+  const laAdmin = hienTai?.vaiTro === "ADMIN";
+  const giaoVien = laAdmin
+    ? await prisma.giaoVien.findMany({ orderBy: { hoTen: "asc" } })
+    : [];
 
   return (
     <div className="space-y-6 max-w-3xl">
@@ -24,7 +29,10 @@ export default async function NhapFilePage() {
         </p>
       </div>
 
-      <NhapChuongTrinhForm giaoVien={giaoVien} />
+      <NhapChuongTrinhForm
+        giaoVien={giaoVien}
+        tenHienTaiNeuKhongPhaiAdmin={laAdmin ? undefined : (hienTai?.giaoVienHoTen ?? null)}
+      />
     </div>
   );
 }

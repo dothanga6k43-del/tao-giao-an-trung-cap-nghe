@@ -7,6 +7,8 @@ import {
   capNhatNoiDungMuc,
   xoaNoiDungMuc,
 } from "@/lib/actions/chuong-trinh";
+import { layTaiKhoanHienTai } from "@/lib/auth/session";
+import { yeuCauQuyenXem } from "@/lib/auth/pham-vi";
 import { ChevronLeft, PencilLine, ListTree, Plus, Save, Trash2 } from "lucide-react";
 
 const LOAI_LABEL: Record<string, string> = {
@@ -31,6 +33,9 @@ export default async function BaiHocDetailPage(
   });
 
   if (!bai || bai.monHocId !== id) notFound();
+
+  const hienTai = await layTaiKhoanHienTai();
+  yeuCauQuyenXem(hienTai, bai.monHoc.giaoVienId);
 
   const mucCha = bai.noiDungMuc.filter((m) => !m.parentId);
   const conCuaCha = (chaId: string) =>

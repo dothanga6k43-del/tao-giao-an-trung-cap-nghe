@@ -9,6 +9,8 @@ import {
   type ChuongTrinhTrichXuat,
 } from "@/lib/chuongtrinh/import";
 import { dienGiaiLoiAI } from "@/lib/dien-giai-loi-ai";
+import { layTaiKhoanHienTai } from "@/lib/auth/session";
+import { giaoVienIdKhiTao } from "@/lib/auth/pham-vi";
 
 export type TrangThaiPhanTich = {
   data: ChuongTrinhTrichXuat | null;
@@ -43,8 +45,11 @@ export async function phanTichFileWord(
 
 export async function luuChuongTrinhTuFile(formData: FormData) {
   const raw = String(formData.get("duLieuJson") ?? "");
-  const giaoVienId = String(formData.get("giaoVienId") ?? "").trim() || null;
   if (!raw) throw new Error("Không có dữ liệu để lưu");
+
+  const hienTai = await layTaiKhoanHienTai();
+  const giaoVienIdDaChon = String(formData.get("giaoVienId") ?? "").trim() || null;
+  const giaoVienId = giaoVienIdKhiTao(hienTai, giaoVienIdDaChon);
 
   const data = JSON.parse(raw) as ChuongTrinhTrichXuat;
 

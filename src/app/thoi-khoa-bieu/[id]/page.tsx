@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { xoaThoiKhoaBieu } from "@/lib/actions/nhap-thoi-khoa-bieu";
+import { layTaiKhoanHienTai } from "@/lib/auth/session";
+import { yeuCauQuyenXem } from "@/lib/auth/pham-vi";
 import { ChevronLeft, Clock3, Trash2 } from "lucide-react";
 
 const TEN_THU: Record<number, string> = {
@@ -25,6 +27,9 @@ export default async function ThoiKhoaBieuDetailPage({
     include: { dong: true },
   });
   if (!tkb) notFound();
+
+  const hienTai = await layTaiKhoanHienTai();
+  yeuCauQuyenXem(hienTai, tkb.giaoVienId);
 
   const theoLop = new Map<
     string,

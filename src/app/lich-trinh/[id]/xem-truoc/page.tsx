@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import TrangXemTruocWord from "@/components/TrangXemTruocWord";
+import { layTaiKhoanHienTai } from "@/lib/auth/session";
+import { yeuCauQuyenXem } from "@/lib/auth/pham-vi";
 
 function formatNgay(d: Date) {
   return new Date(d).toLocaleDateString("vi-VN");
@@ -30,6 +32,9 @@ export default async function LichTrinhXemTruocPage(
   });
 
   if (!lichTrinh) notFound();
+
+  const hienTai = await layTaiKhoanHienTai();
+  yeuCauQuyenXem(hienTai, lichTrinh.giaoVienId);
 
   const tongTiet = lichTrinh.buoiDay.reduce((s, b) => s + b.tongTiet, 0);
   const tongLT = lichTrinh.buoiDay.reduce((s, b) => s + b.lyThuyetTiet, 0);

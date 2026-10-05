@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { parseNoiDungGiaoAn } from "@/lib/giaoan/schema";
 import { layHangBangNoiDung } from "@/lib/giaoan/bang-noi-dung";
 import TrangXemTruocWord from "@/components/TrangXemTruocWord";
+import { layTaiKhoanHienTai } from "@/lib/auth/session";
+import { yeuCauQuyenXem } from "@/lib/auth/pham-vi";
 
 export default async function GiaoAnXemTruocPage(
   props: PageProps<"/giao-an/[id]/xem-truoc">
@@ -19,6 +21,9 @@ export default async function GiaoAnXemTruocPage(
   });
 
   if (!giaoAn) notFound();
+
+  const hienTai = await layTaiKhoanHienTai();
+  yeuCauQuyenXem(hienTai, giaoAn.buoiDay.lichTrinh.giaoVienId);
 
   const noiDung = parseNoiDungGiaoAn(giaoAn.noiDungJson);
   const hang = layHangBangNoiDung(noiDung);

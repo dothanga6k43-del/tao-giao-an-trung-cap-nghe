@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import NhapChiTietChuongTrinhForm from "@/components/NhapChiTietChuongTrinhForm";
+import { layTaiKhoanHienTai } from "@/lib/auth/session";
+import { yeuCauQuyenXem } from "@/lib/auth/pham-vi";
 import { ChevronLeft } from "lucide-react";
 
 export const maxDuration = 60;
@@ -16,6 +18,9 @@ export default async function NhapChiTietPage(
     include: { baiHoc: { select: { tenBai: true } } },
   });
   if (!mon) notFound();
+
+  const hienTai = await layTaiKhoanHienTai();
+  yeuCauQuyenXem(hienTai, mon.giaoVienId);
 
   return (
     <div className="space-y-6 max-w-3xl">

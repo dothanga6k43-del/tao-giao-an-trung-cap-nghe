@@ -12,6 +12,8 @@ import {
   xoaLichTrinh,
 } from "@/lib/actions/lich-trinh";
 import { taoGiaoAnBangAI } from "@/lib/actions/giao-an";
+import { layTaiKhoanHienTai } from "@/lib/auth/session";
+import { yeuCauQuyenXem } from "@/lib/auth/pham-vi";
 import {
   ChevronLeft,
   Trash2,
@@ -72,6 +74,9 @@ export default async function LichTrinhDetailPage(
   });
 
   if (!lichTrinh) notFound();
+
+  const hienTai = await layTaiKhoanHienTai();
+  yeuCauQuyenXem(hienTai, lichTrinh.giaoVienId);
 
   const daDuyet = lichTrinh.trangThai === "APPROVED";
   const tongTietDaXep = lichTrinh.buoiDay.reduce((s, b) => s + b.tongTiet, 0);

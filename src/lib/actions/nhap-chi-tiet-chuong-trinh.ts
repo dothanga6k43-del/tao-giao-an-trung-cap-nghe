@@ -11,6 +11,8 @@ import {
 import { vanBanTuExcel } from "@/lib/thoikhoabieu/import";
 import { chuanHoaTenBai } from "@/lib/chuongtrinh/ten-bai";
 import { dienGiaiLoiAI } from "@/lib/dien-giai-loi-ai";
+import { layTaiKhoanHienTai } from "@/lib/auth/session";
+import { yeuCauQuyenSua } from "@/lib/auth/pham-vi";
 
 export type TrangThaiPhanTichChiTiet = {
   data: ChuongTrinhTrichXuat | null;
@@ -61,6 +63,10 @@ export async function luuChiTietTuFile(formData: FormData) {
   const raw = String(formData.get("duLieuJson") ?? "");
   if (!monHocId) throw new Error("Thiếu môn học");
   if (!raw) throw new Error("Không có dữ liệu để lưu");
+
+  const hienTai = await layTaiKhoanHienTai();
+  const mon = await prisma.monHoc.findUniqueOrThrow({ where: { id: monHocId } });
+  yeuCauQuyenSua(hienTai, mon.giaoVienId);
 
   const data = JSON.parse(raw) as ChuongTrinhTrichXuat;
   const boQua: string[] = [];

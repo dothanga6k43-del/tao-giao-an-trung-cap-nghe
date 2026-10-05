@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { taoLop, xoaLop } from "@/lib/actions/lop";
+import { layTaiKhoanHienTai } from "@/lib/auth/session";
+import { dieuKienTheoGiaoVien } from "@/lib/auth/pham-vi";
 import { Users, Plus, Trash2, FileSpreadsheet, CheckCircle2 } from "lucide-react";
 
 export default async function LopPage(props: PageProps<"/lop">) {
@@ -8,7 +10,11 @@ export default async function LopPage(props: PageProps<"/lop">) {
   const daThem = typeof searchParams.daThem === "string" ? Number(searchParams.daThem) : null;
   const boQua = typeof searchParams.boQua === "string" ? Number(searchParams.boQua) : 0;
 
-  const danhSach = await prisma.lop.findMany({ orderBy: { tenLop: "asc" } });
+  const hienTai = await layTaiKhoanHienTai();
+  const danhSach = await prisma.lop.findMany({
+    where: dieuKienTheoGiaoVien(hienTai),
+    orderBy: { tenLop: "asc" },
+  });
 
   return (
     <div className="space-y-8">

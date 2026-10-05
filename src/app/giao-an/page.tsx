@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { layTaiKhoanHienTai } from "@/lib/auth/session";
+import { dieuKienTheoGiaoVien } from "@/lib/auth/pham-vi";
 import { FileText, Search, ChevronRight, CheckCircle2, PencilLine } from "lucide-react";
 
 const TRANG_THAI_LABEL: Record<string, string> = {
@@ -18,28 +20,32 @@ export default async function GiaoAnListPage(
   const searchParams = await props.searchParams;
   const q = typeof searchParams.q === "string" ? searchParams.q.trim() : "";
 
+  const hienTai = await layTaiKhoanHienTai();
   const danhSach = await prisma.giaoAn.findMany({
-    where: q
-      ? {
-          OR: [
-            { tenBai: { contains: q, mode: "insensitive" } },
-            {
-              buoiDay: {
-                lichTrinh: {
-                  monHoc: { tenMonHoc: { contains: q, mode: "insensitive" } },
+    where: {
+      buoiDay: { lichTrinh: dieuKienTheoGiaoVien(hienTai) },
+      ...(q
+        ? {
+            OR: [
+              { tenBai: { contains: q, mode: "insensitive" as const } },
+              {
+                buoiDay: {
+                  lichTrinh: {
+                    monHoc: { tenMonHoc: { contains: q, mode: "insensitive" as const } },
+                  },
                 },
               },
-            },
-            {
-              buoiDay: {
-                lichTrinh: {
-                  lop: { tenLop: { contains: q, mode: "insensitive" } },
+              {
+                buoiDay: {
+                  lichTrinh: {
+                    lop: { tenLop: { contains: q, mode: "insensitive" as const } },
+                  },
                 },
               },
-            },
-          ],
-        }
-      : undefined,
+            ],
+          }
+        : {}),
+    },
     orderBy: { updatedAt: "desc" },
     include: {
       buoiDay: {
