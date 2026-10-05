@@ -1,5 +1,6 @@
 import Link from "next/link";
 import NhapThoiKhoaBieuForm from "@/components/NhapThoiKhoaBieuForm";
+import { ChevronLeft } from "lucide-react";
 
 export const maxDuration = 60;
 
@@ -8,7 +9,8 @@ export default function NhapThoiKhoaBieuPage() {
     <div className="space-y-6 max-w-3xl">
       <div>
         <p className="text-sm text-slate-500">
-          <Link href="/thoi-khoa-bieu" className="hover:underline">
+          <Link href="/thoi-khoa-bieu" className="inline-flex items-center gap-1 hover:underline">
+            <ChevronLeft className="h-3.5 w-3.5" strokeWidth={2} />
             Thời khóa biểu
           </Link>
         </p>

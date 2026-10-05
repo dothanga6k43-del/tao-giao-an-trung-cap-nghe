@@ -7,6 +7,7 @@ import {
   capNhatNoiDungMuc,
   xoaNoiDungMuc,
 } from "@/lib/actions/chuong-trinh";
+import { ChevronLeft, PencilLine, ListTree, Plus, Save, Trash2 } from "lucide-react";
 
 const LOAI_LABEL: Record<string, string> = {
   LT: "Lý thuyết",
@@ -44,7 +45,8 @@ export default async function BaiHocDetailPage(
     <div className="space-y-8">
       <div>
         <p className="text-sm text-slate-500">
-          <Link href="/chuong-trinh" className="hover:underline">
+          <Link href="/chuong-trinh" className="inline-flex items-center gap-1 hover:underline">
+            <ChevronLeft className="h-3.5 w-3.5" strokeWidth={2} />
             Chương trình môn học
           </Link>{" "}
           /{" "}
@@ -57,7 +59,8 @@ export default async function BaiHocDetailPage(
       </div>
 
       <details className="bg-white border border-slate-200 rounded-lg p-5" open={false}>
-        <summary className="cursor-pointer text-sm font-medium text-slate-700">
+        <summary className="flex items-center gap-1.5 cursor-pointer text-sm font-medium text-slate-700">
+          <PencilLine className="h-4 w-4 text-slate-500" strokeWidth={1.75} />
           Sửa thông tin bài học
         </summary>
         <form action={capNhatBaiHoc} className="mt-4 space-y-4">
@@ -137,8 +140,9 @@ export default async function BaiHocDetailPage(
           </div>
           <button
             type="submit"
-            className="rounded-md bg-slate-900 text-white px-4 py-2 text-sm font-medium hover:bg-slate-700"
+            className="inline-flex items-center gap-2 rounded-md bg-slate-900 text-white px-4 py-2 text-sm font-medium hover:bg-slate-700"
           >
+            <Save className="h-4 w-4" strokeWidth={1.75} />
             Lưu thay đổi
           </button>
         </form>
@@ -146,7 +150,10 @@ export default async function BaiHocDetailPage(
 
       <section className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Nội dung chi tiết</h2>
+          <h2 className="flex items-center gap-2 text-lg font-semibold">
+            <ListTree className="h-5 w-5 text-slate-500" strokeWidth={1.75} />
+            Nội dung chi tiết
+          </h2>
           <p className="text-sm text-slate-500">
             Đã gán: {tongThoiGianDaGan} / {bai.tongSoGio} giờ
             {tongThoiGianDaGan !== bai.tongSoGio && (
@@ -180,7 +187,7 @@ export default async function BaiHocDetailPage(
                   baiHocId={bai.id}
                   monHocId={id}
                   parentId={mc.id}
-                  label="+ Thêm đề mục con"
+                  label="Thêm đề mục con"
                 />
               </div>
             </div>
@@ -188,8 +195,9 @@ export default async function BaiHocDetailPage(
         </div>
 
         <details className="bg-white border border-slate-200 rounded-lg p-5">
-          <summary className="cursor-pointer text-sm font-medium text-slate-700">
-            + Thêm đề mục lớn
+          <summary className="flex items-center gap-1.5 cursor-pointer text-sm font-medium text-slate-700">
+            <Plus className="h-4 w-4" strokeWidth={2.25} />
+            Thêm đề mục lớn
           </summary>
           <div className="mt-4">
             <FormThemMoi baiHocId={bai.id} monHocId={id} parentId={null} label="Thêm" />
@@ -246,15 +254,17 @@ function DongNoiDung({
       />
       <button
         type="submit"
-        className="text-xs rounded-md bg-slate-100 text-slate-700 px-2.5 py-1.5 hover:bg-slate-200"
+        className="inline-flex items-center gap-1 text-xs rounded-md bg-slate-100 text-slate-700 px-2.5 py-1.5 hover:bg-slate-200"
       >
+        <Save className="h-3.5 w-3.5" strokeWidth={1.75} />
         Lưu
       </button>
       <button
         type="submit"
         formAction={xoaNoiDungMuc}
-        className="text-xs text-red-600 hover:underline"
+        className="inline-flex items-center gap-1 text-xs text-red-600 hover:underline"
       >
+        <Trash2 className="h-3.5 w-3.5" strokeWidth={1.75} />
         Xóa
       </button>
     </form>
@@ -301,8 +311,9 @@ function FormThemMoi({
       />
       <button
         type="submit"
-        className="text-xs rounded-md bg-slate-900 text-white px-3 py-1.5 hover:bg-slate-700"
+        className="inline-flex items-center gap-1 text-xs rounded-md bg-slate-900 text-white px-3 py-1.5 hover:bg-slate-700"
       >
+        <Plus className="h-3.5 w-3.5" strokeWidth={2.25} />
         {label}
       </button>
     </form>

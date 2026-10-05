@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 import { taoLichTrinh } from "@/lib/actions/lich-trinh";
+import { DownloadCloud, Info, Plus, Table2 } from "lucide-react";
 
 const THU_LIST = [2, 3, 4, 5, 6, 7] as const;
 const THU_LABEL: Record<number, string> = {
@@ -204,7 +205,8 @@ export default function LichTrinhMoiForm({
 
       {thoiKhoaBieu.length > 0 && (
         <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-3">
-          <h2 className="text-sm font-semibold text-slate-800">
+          <h2 className="flex items-center gap-1.5 text-sm font-semibold text-slate-800">
+            <DownloadCloud className="h-4 w-4 text-slate-500" strokeWidth={1.75} />
             Nạp khung tiết từ thời khóa biểu đã lưu
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -263,16 +265,23 @@ export default function LichTrinhMoiForm({
             type="button"
             onClick={napKhungTiet}
             disabled={!tkbTietBlock}
-            className="rounded-md border border-slate-300 text-slate-700 px-4 py-2 text-sm font-medium hover:bg-white disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-md border border-slate-300 text-slate-700 px-4 py-2 text-sm font-medium hover:bg-white disabled:opacity-50"
           >
+            <DownloadCloud className="h-4 w-4" strokeWidth={1.75} />
             Nạp khung tiết vào bảng bên dưới
           </button>
-          {thongBao && <p className="text-xs text-slate-500">{thongBao}</p>}
+          {thongBao && (
+            <p className="flex items-start gap-1.5 text-xs text-slate-500">
+              <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" strokeWidth={2} />
+              {thongBao}
+            </p>
+          )}
         </div>
       )}
 
       <div>
-        <h2 className="text-sm font-semibold text-slate-800 mb-2">
+        <h2 className="flex items-center gap-1.5 text-sm font-semibold text-slate-800 mb-2">
+          <Table2 className="h-4 w-4 text-slate-500" strokeWidth={1.75} />
           Khung tiết theo thời khóa biểu (để trống ngày không học môn này)
         </h2>
         <div className="border border-slate-200 rounded-lg overflow-hidden">
@@ -332,8 +341,9 @@ export default function LichTrinhMoiForm({
 
       <button
         type="submit"
-        className="rounded-md bg-slate-900 text-white px-5 py-2.5 text-sm font-medium hover:bg-slate-700"
+        className="inline-flex items-center gap-2 rounded-md bg-slate-900 text-white px-5 py-2.5 text-sm font-medium hover:bg-slate-700"
       >
+        <Plus className="h-4 w-4" strokeWidth={2.25} />
         Tạo lịch trình
       </button>
     </form>

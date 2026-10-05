@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import NhapChuongTrinhForm from "@/components/NhapChuongTrinhForm";
+import { ChevronLeft } from "lucide-react";
 
 export const maxDuration = 60;
 
@@ -11,7 +12,8 @@ export default async function NhapFilePage() {
     <div className="space-y-6 max-w-3xl">
       <div>
         <p className="text-sm text-slate-500">
-          <Link href="/chuong-trinh" className="hover:underline">
+          <Link href="/chuong-trinh" className="inline-flex items-center gap-1 hover:underline">
+            <ChevronLeft className="h-3.5 w-3.5" strokeWidth={2} />
             Chương trình môn học
           </Link>
         </p>

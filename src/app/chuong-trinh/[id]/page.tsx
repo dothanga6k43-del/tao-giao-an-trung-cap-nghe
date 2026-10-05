@@ -3,6 +3,16 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { taoBaiHoc, xoaBaiHoc, xoaMonHoc } from "@/lib/actions/chuong-trinh";
 import { xoaMauGiaoAn } from "@/lib/actions/giao-an-mau";
+import {
+  ChevronLeft,
+  Trash2,
+  LayoutTemplate,
+  UploadCloud,
+  AlertTriangle,
+  ListChecks,
+  FileUp,
+  Plus,
+} from "lucide-react";
 
 export default async function MonHocDetailPage(props: PageProps<"/chuong-trinh/[id]">) {
   const { id } = await props.params;
@@ -25,17 +35,21 @@ export default async function MonHocDetailPage(props: PageProps<"/chuong-trinh/[
   return (
     <div className="space-y-8">
       {boQuaChiTiet && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-800">
-          Đã bỏ qua cập nhật nội dung chi tiết cho: <strong>{boQuaChiTiet}</strong> — bài
-          này đang được dùng trong một lịch trình giảng dạy đã xếp buổi, không thể
-          ghi đè. Hãy &quot;Mở duyệt lại&quot; và xóa lịch trình liên quan trước nếu
-          muốn cập nhật nội dung chi tiết của bài này.
+        <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-800">
+          <AlertTriangle className="mt-0.5 h-4.5 w-4.5 shrink-0" strokeWidth={1.75} />
+          <span>
+            Đã bỏ qua cập nhật nội dung chi tiết cho: <strong>{boQuaChiTiet}</strong> — bài
+            này đang được dùng trong một lịch trình giảng dạy đã xếp buổi, không thể
+            ghi đè. Hãy &quot;Mở duyệt lại&quot; và xóa lịch trình liên quan trước nếu
+            muốn cập nhật nội dung chi tiết của bài này.
+          </span>
         </div>
       )}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-sm text-slate-500">
-            <Link href="/chuong-trinh" className="hover:underline">
+            <Link href="/chuong-trinh" className="inline-flex items-center gap-1 hover:underline">
+              <ChevronLeft className="h-3.5 w-3.5" strokeWidth={2} />
               Chương trình môn học
             </Link>{" "}
             / {mon.tenMonHoc}
@@ -53,32 +67,44 @@ export default async function MonHocDetailPage(props: PageProps<"/chuong-trinh/[
         </div>
         <form action={xoaMonHoc}>
           <input type="hidden" name="id" value={mon.id} />
-          <button type="submit" className="text-sm text-red-600 hover:underline">
+          <button
+            type="submit"
+            className="inline-flex items-center gap-1.5 text-sm text-red-600 hover:underline"
+          >
+            <Trash2 className="h-4 w-4" strokeWidth={1.75} />
             Xóa môn học
           </button>
         </form>
       </div>
 
       <div className="bg-white border border-slate-200 rounded-lg p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-sm font-medium text-slate-800">Mẫu giáo án riêng</p>
-          <p className="text-sm text-slate-500">
-            {mon.mauGiaoAnTenFile
-              ? `Đang dùng mẫu: ${mon.mauGiaoAnTenFile}`
-              : "Chưa có mẫu riêng — AI sẽ soạn giáo án theo khung mặc định (Dẫn nhập, Giới thiệu chủ đề, Giải quyết vấn đề, Kết thúc vấn đề, Hướng dẫn tự học)."}
-          </p>
+        <div className="flex items-start gap-3">
+          <LayoutTemplate className="mt-0.5 h-5 w-5 shrink-0 text-slate-400" strokeWidth={1.75} />
+          <div>
+            <p className="text-sm font-medium text-slate-800">Mẫu giáo án riêng</p>
+            <p className="text-sm text-slate-500">
+              {mon.mauGiaoAnTenFile
+                ? `Đang dùng mẫu: ${mon.mauGiaoAnTenFile}`
+                : "Chưa có mẫu riêng — AI sẽ soạn giáo án theo khung mặc định (Dẫn nhập, Giới thiệu chủ đề, Giải quyết vấn đề, Kết thúc vấn đề, Hướng dẫn tự học)."}
+            </p>
+          </div>
         </div>
         <div className="flex items-center gap-3 self-start">
           <Link
             href={`/chuong-trinh/${mon.id}/mau-giao-an`}
-            className="text-sm rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-50"
+            className="inline-flex items-center gap-1.5 text-sm rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-50"
           >
+            <UploadCloud className="h-4 w-4" strokeWidth={1.75} />
             {mon.mauGiaoAnTenFile ? "Thay mẫu khác" : "Tải lên mẫu giáo án"}
           </Link>
           {mon.mauGiaoAnTenFile && (
             <form action={xoaMauGiaoAn}>
               <input type="hidden" name="monHocId" value={mon.id} />
-              <button type="submit" className="text-sm text-red-600 hover:underline">
+              <button
+                type="submit"
+                className="inline-flex items-center gap-1.5 text-sm text-red-600 hover:underline"
+              >
+                <Trash2 className="h-4 w-4" strokeWidth={1.75} />
                 Bỏ mẫu
               </button>
             </form>
@@ -89,7 +115,8 @@ export default async function MonHocDetailPage(props: PageProps<"/chuong-trinh/[
       <section className="space-y-3">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-lg font-semibold">
+            <h2 className="flex items-center gap-2 text-lg font-semibold">
+              <ListChecks className="h-5 w-5 text-slate-500" strokeWidth={1.75} />
               Nội dung tổng quát (các bài)
             </h2>
             <p className="text-sm text-slate-500">
@@ -101,9 +128,10 @@ export default async function MonHocDetailPage(props: PageProps<"/chuong-trinh/[
           </div>
           <Link
             href={`/chuong-trinh/${mon.id}/nhap-chi-tiet`}
-            className="self-start rounded-md border border-slate-300 text-slate-700 px-3 py-1.5 text-sm font-medium hover:bg-slate-50"
+            className="inline-flex items-center gap-2 self-start rounded-md border border-slate-300 text-slate-700 px-3 py-1.5 text-sm font-medium hover:bg-slate-50"
           >
-            + Nhập chi tiết từ file
+            <FileUp className="h-4 w-4" strokeWidth={1.75} />
+            Nhập chi tiết từ file
           </Link>
         </div>
 
@@ -147,8 +175,9 @@ export default async function MonHocDetailPage(props: PageProps<"/chuong-trinh/[
                         <input type="hidden" name="monHocId" value={mon.id} />
                         <button
                           type="submit"
-                          className="text-xs text-red-600 hover:underline"
+                          className="inline-flex items-center gap-1 text-xs text-red-600 hover:underline"
                         >
+                          <Trash2 className="h-3.5 w-3.5" strokeWidth={1.75} />
                           Xóa
                         </button>
                       </form>
@@ -168,8 +197,9 @@ export default async function MonHocDetailPage(props: PageProps<"/chuong-trinh/[
         </div>
 
         <details className="bg-white border border-slate-200 rounded-lg p-5">
-          <summary className="cursor-pointer text-sm font-medium text-slate-700">
-            + Thêm bài mới
+          <summary className="flex items-center gap-1.5 cursor-pointer text-sm font-medium text-slate-700">
+            <Plus className="h-4 w-4" strokeWidth={2.25} />
+            Thêm bài mới
           </summary>
           <form action={taoBaiHoc} className="mt-4 space-y-4">
             <input type="hidden" name="monHocId" value={mon.id} />
@@ -246,8 +276,9 @@ export default async function MonHocDetailPage(props: PageProps<"/chuong-trinh/[
             </div>
             <button
               type="submit"
-              className="rounded-md bg-slate-900 text-white px-4 py-2 text-sm font-medium hover:bg-slate-700"
+              className="inline-flex items-center gap-2 rounded-md bg-slate-900 text-white px-4 py-2 text-sm font-medium hover:bg-slate-700"
             >
+              <Plus className="h-4 w-4" strokeWidth={2.25} />
               Thêm bài và soạn nội dung chi tiết
             </button>
           </form>

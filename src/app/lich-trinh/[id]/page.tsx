@@ -12,6 +12,21 @@ import {
   xoaLichTrinh,
 } from "@/lib/actions/lich-trinh";
 import { taoGiaoAnBangAI } from "@/lib/actions/giao-an";
+import {
+  ChevronLeft,
+  Trash2,
+  Table2,
+  CalendarOff,
+  Plus,
+  ClipboardList,
+  RefreshCw,
+  FileText,
+  Sparkles,
+  Save,
+  Unlock,
+  CheckCircle2,
+  PencilLine,
+} from "lucide-react";
 
 const THU_LABEL: Record<number, string> = {
   2: "Thứ 2",
@@ -65,7 +80,8 @@ export default async function LichTrinhDetailPage(
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-sm text-slate-500">
-            <Link href="/lich-trinh" className="hover:underline">
+            <Link href="/lich-trinh" className="inline-flex items-center gap-1 hover:underline">
+              <ChevronLeft className="h-3.5 w-3.5" strokeWidth={2} />
               Lịch trình giảng dạy
             </Link>
           </p>
@@ -81,18 +97,27 @@ export default async function LichTrinhDetailPage(
         </div>
         <div className="flex items-center gap-3">
           <span
-            className={`text-xs font-medium px-2.5 py-1 rounded-full ${
+            className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full ${
               daDuyet
                 ? "bg-emerald-100 text-emerald-700"
                 : "bg-amber-100 text-amber-700"
             }`}
           >
+            {daDuyet ? (
+              <CheckCircle2 className="h-3.5 w-3.5" strokeWidth={2} />
+            ) : (
+              <PencilLine className="h-3.5 w-3.5" strokeWidth={2} />
+            )}
             {daDuyet ? "Đã duyệt" : "Nháp"}
           </span>
           {!daDuyet && (
             <form action={xoaLichTrinh}>
               <input type="hidden" name="id" value={lichTrinh.id} />
-              <button type="submit" className="text-sm text-red-600 hover:underline">
+              <button
+                type="submit"
+                className="inline-flex items-center gap-1.5 text-sm text-red-600 hover:underline"
+              >
+                <Trash2 className="h-4 w-4" strokeWidth={1.75} />
                 Xóa
               </button>
             </form>
@@ -102,7 +127,8 @@ export default async function LichTrinhDetailPage(
 
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white border border-slate-200 rounded-lg p-5">
-          <h2 className="text-sm font-semibold text-slate-800 mb-3">
+          <h2 className="flex items-center gap-1.5 text-sm font-semibold text-slate-800 mb-3">
+            <Table2 className="h-4 w-4 text-slate-500" strokeWidth={1.75} />
             Khung tiết theo thời khóa biểu
           </h2>
           <ul className="text-sm text-slate-600 space-y-1">
@@ -120,7 +146,10 @@ export default async function LichTrinhDetailPage(
         </div>
 
         <div className="bg-white border border-slate-200 rounded-lg p-5">
-          <h2 className="text-sm font-semibold text-slate-800 mb-3">Ngày nghỉ</h2>
+          <h2 className="flex items-center gap-1.5 text-sm font-semibold text-slate-800 mb-3">
+            <CalendarOff className="h-4 w-4 text-slate-500" strokeWidth={1.75} />
+            Ngày nghỉ
+          </h2>
           <ul className="text-sm text-slate-600 space-y-1 mb-3">
             {lichTrinh.ngayNghi.map((n) => (
               <li key={n.id} className="flex items-center justify-between">
@@ -132,7 +161,8 @@ export default async function LichTrinhDetailPage(
                   <form action={xoaNgayNghi}>
                     <input type="hidden" name="id" value={n.id} />
                     <input type="hidden" name="lichTrinhId" value={lichTrinh.id} />
-                    <button className="text-xs text-red-600 hover:underline">
+                    <button className="inline-flex items-center gap-1 text-xs text-red-600 hover:underline">
+                      <Trash2 className="h-3.5 w-3.5" strokeWidth={1.75} />
                       Xóa
                     </button>
                   </form>
@@ -157,7 +187,8 @@ export default async function LichTrinhDetailPage(
                 placeholder="Lý do"
                 className="min-w-0 flex-1 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
               />
-              <button className="text-xs rounded-md bg-slate-100 px-3 py-1.5 hover:bg-slate-200">
+              <button className="inline-flex items-center gap-1 text-xs rounded-md bg-slate-100 px-3 py-1.5 hover:bg-slate-200">
+                <Plus className="h-3.5 w-3.5" strokeWidth={2.25} />
                 Thêm
               </button>
             </form>
@@ -167,7 +198,8 @@ export default async function LichTrinhDetailPage(
 
       <section className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">
+          <h2 className="flex items-center gap-2 text-lg font-semibold">
+            <ClipboardList className="h-5 w-5 text-slate-500" strokeWidth={1.75} />
             Các buổi dạy ({lichTrinh.buoiDay.length} buổi · {tongTietDaXep} tiết)
           </h2>
           {!daDuyet && (
@@ -175,8 +207,9 @@ export default async function LichTrinhDetailPage(
               <input type="hidden" name="lichTrinhId" value={lichTrinh.id} />
               <button
                 type="submit"
-                className="rounded-md bg-slate-900 text-white px-4 py-2 text-sm font-medium hover:bg-slate-700"
+                className="inline-flex items-center gap-2 rounded-md bg-slate-900 text-white px-4 py-2 text-sm font-medium hover:bg-slate-700"
               >
+                <RefreshCw className="h-4 w-4" strokeWidth={1.75} />
                 {lichTrinh.buoiDay.length > 0 ? "Sinh lại lịch trình" : "Sinh lịch trình"}
               </button>
             </form>
@@ -220,15 +253,17 @@ export default async function LichTrinhDetailPage(
                     {b.giaoAn ? (
                       <Link
                         href={`/giao-an/${b.giaoAn.id}`}
-                        className="inline-block mt-2 text-sm text-blue-600 hover:underline"
+                        className="inline-flex items-center gap-1.5 mt-2 text-sm text-blue-600 hover:underline"
                       >
-                        Xem giáo án →
+                        <FileText className="h-4 w-4" strokeWidth={1.75} />
+                        Xem giáo án
                       </Link>
                     ) : (
                       daDuyet && (
                         <form action={taoGiaoAnBangAI} className="mt-2">
                           <input type="hidden" name="buoiDayId" value={b.id} />
-                          <button className="text-sm rounded-md bg-blue-600 text-white px-3 py-1.5 hover:bg-blue-500">
+                          <button className="inline-flex items-center gap-1.5 text-sm rounded-md bg-blue-600 text-white px-3 py-1.5 hover:bg-blue-500">
+                            <Sparkles className="h-4 w-4" strokeWidth={1.75} />
                             Soạn giáo án bằng AI
                           </button>
                         </form>
@@ -278,13 +313,15 @@ export default async function LichTrinhDetailPage(
                     </div>
                     {!daDuyet && (
                       <div className="flex justify-between">
-                        <button className="text-xs rounded-md bg-slate-100 px-3 py-1.5 hover:bg-slate-200">
+                        <button className="inline-flex items-center gap-1.5 text-xs rounded-md bg-slate-100 px-3 py-1.5 hover:bg-slate-200">
+                          <Save className="h-3.5 w-3.5" strokeWidth={1.75} />
                           Lưu
                         </button>
                         <button
                           formAction={xoaBuoiDay}
-                          className="text-xs text-red-600 hover:underline"
+                          className="inline-flex items-center gap-1 text-xs text-red-600 hover:underline"
                         >
+                          <Trash2 className="h-3.5 w-3.5" strokeWidth={1.75} />
                           Xóa buổi
                         </button>
                       </div>
@@ -308,14 +345,16 @@ export default async function LichTrinhDetailPage(
           {daDuyet ? (
             <form action={moDuyetLaiLichTrinh}>
               <input type="hidden" name="id" value={lichTrinh.id} />
-              <button className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium hover:bg-slate-50">
+              <button className="inline-flex items-center gap-2 rounded-md border border-slate-300 px-4 py-2 text-sm font-medium hover:bg-slate-50">
+                <Unlock className="h-4 w-4" strokeWidth={1.75} />
                 Mở duyệt lại
               </button>
             </form>
           ) : (
             <form action={duyetLichTrinh}>
               <input type="hidden" name="id" value={lichTrinh.id} />
-              <button className="rounded-md bg-emerald-600 text-white px-5 py-2.5 text-sm font-medium hover:bg-emerald-500">
+              <button className="inline-flex items-center gap-2 rounded-md bg-emerald-600 text-white px-5 py-2.5 text-sm font-medium hover:bg-emerald-500">
+                <CheckCircle2 className="h-4 w-4" strokeWidth={1.75} />
                 Duyệt lịch trình
               </button>
             </form>

@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { taoGiaoVien, xoaGiaoVien } from "@/lib/actions/giao-vien";
+import { GraduationCap, Plus, Trash2 } from "lucide-react";
 
 export default async function GiaoVienPage() {
   const danhSach = await prisma.giaoVien.findMany({
@@ -9,7 +10,10 @@ export default async function GiaoVienPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold">Giáo viên</h1>
+        <h1 className="flex items-center gap-2.5 text-2xl font-semibold">
+          <GraduationCap className="h-6 w-6 text-slate-500" strokeWidth={1.75} />
+          Giáo viên
+        </h1>
         <p className="text-slate-500 mt-1 text-sm">
           Danh sách giáo viên dùng để gán vào môn học và lịch trình giảng dạy.
         </p>
@@ -42,30 +46,38 @@ export default async function GiaoVienPage() {
         </div>
         <button
           type="submit"
-          className="rounded-md bg-slate-900 text-white px-4 py-2 text-sm font-medium hover:bg-slate-700"
+          className="inline-flex items-center gap-2 rounded-md bg-slate-900 text-white px-4 py-2 text-sm font-medium hover:bg-slate-700"
         >
+          <Plus className="h-4 w-4" strokeWidth={2.25} />
           Thêm giáo viên
         </button>
       </form>
 
       <div className="bg-white border border-slate-200 rounded-lg divide-y divide-slate-100">
         {danhSach.length === 0 && (
-          <p className="p-5 text-sm text-slate-500">Chưa có giáo viên nào.</p>
+          <div className="p-10 text-center">
+            <GraduationCap className="mx-auto h-9 w-9 text-slate-300" strokeWidth={1.5} />
+            <p className="mt-3 text-sm text-slate-500">Chưa có giáo viên nào.</p>
+          </div>
         )}
         {danhSach.map((gv) => (
-          <div key={gv.id} className="flex items-center justify-between p-4">
-            <div>
-              <p className="font-medium text-slate-900">{gv.hoTen}</p>
-              {gv.soDienThoai && (
-                <p className="text-sm text-slate-500">{gv.soDienThoai}</p>
-              )}
+          <div key={gv.id} className="flex items-center justify-between gap-3 p-4">
+            <div className="flex items-start gap-3">
+              <GraduationCap className="mt-0.5 h-5 w-5 shrink-0 text-slate-400" strokeWidth={1.75} />
+              <div>
+                <p className="font-medium text-slate-900">{gv.hoTen}</p>
+                {gv.soDienThoai && (
+                  <p className="text-sm text-slate-500">{gv.soDienThoai}</p>
+                )}
+              </div>
             </div>
             <form action={xoaGiaoVien}>
               <input type="hidden" name="id" value={gv.id} />
               <button
                 type="submit"
-                className="text-sm text-red-600 hover:underline"
+                className="inline-flex items-center gap-1.5 text-sm text-red-600 hover:underline"
               >
+                <Trash2 className="h-4 w-4" strokeWidth={1.75} />
                 Xóa
               </button>
             </form>

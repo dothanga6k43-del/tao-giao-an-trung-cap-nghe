@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { taoMonHoc } from "@/lib/actions/chuong-trinh";
+import { BookOpenText, Save } from "lucide-react";
 
 export default async function MonHocMoiPage() {
   const giaoVien = await prisma.giaoVien.findMany({ orderBy: { hoTen: "asc" } });
@@ -7,7 +8,10 @@ export default async function MonHocMoiPage() {
   return (
     <div className="space-y-6 max-w-3xl">
       <div>
-        <h1 className="text-2xl font-semibold">Thêm môn học</h1>
+        <h1 className="flex items-center gap-2.5 text-2xl font-semibold">
+          <BookOpenText className="h-6 w-6 text-slate-500" strokeWidth={1.75} />
+          Thêm môn học
+        </h1>
         <p className="text-slate-500 mt-1 text-sm">
           Nhập thông tin tổng quan của chương trình môn học (theo mẫu Chương
           trình môn học TCN).
@@ -165,8 +169,9 @@ export default async function MonHocMoiPage() {
         <div className="flex justify-end">
           <button
             type="submit"
-            className="rounded-md bg-slate-900 text-white px-5 py-2.5 text-sm font-medium hover:bg-slate-700"
+            className="inline-flex items-center gap-2 rounded-md bg-slate-900 text-white px-5 py-2.5 text-sm font-medium hover:bg-slate-700"
           >
+            <Save className="h-4 w-4" strokeWidth={1.75} />
             Lưu và tiếp tục thêm bài học
           </button>
         </div>

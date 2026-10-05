@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import LichTrinhMoiForm from "@/components/LichTrinhMoiForm";
+import { ClipboardList } from "lucide-react";
 
 export default async function LichTrinhMoiPage() {
   const [lop, monHoc, giaoVien, thoiKhoaBieu] = await Promise.all([
@@ -19,7 +20,10 @@ export default async function LichTrinhMoiPage() {
   return (
     <div className="space-y-6 max-w-3xl">
       <div>
-        <h1 className="text-2xl font-semibold">Tạo lịch trình giảng dạy</h1>
+        <h1 className="flex items-center gap-2.5 text-2xl font-semibold">
+          <ClipboardList className="h-6 w-6 text-slate-500" strokeWidth={1.75} />
+          Tạo lịch trình giảng dạy
+        </h1>
         <p className="text-slate-500 mt-1 text-sm">
           Chọn lớp, môn học và khung tiết theo thời khóa biểu. Sau khi tạo,
           bạn có thể thêm ngày nghỉ rồi bấm “Sinh lịch trình”.

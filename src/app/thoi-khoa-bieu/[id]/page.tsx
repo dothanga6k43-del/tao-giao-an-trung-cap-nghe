@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { xoaThoiKhoaBieu } from "@/lib/actions/nhap-thoi-khoa-bieu";
+import { ChevronLeft, Clock3, Trash2 } from "lucide-react";
 
 const TEN_THU: Record<number, string> = {
   2: "Thứ 2",
@@ -45,7 +46,8 @@ export default async function ThoiKhoaBieuDetailPage({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-sm text-slate-500">
-            <Link href="/thoi-khoa-bieu" className="hover:underline">
+            <Link href="/thoi-khoa-bieu" className="inline-flex items-center gap-1 hover:underline">
+              <ChevronLeft className="h-3.5 w-3.5" strokeWidth={2} />
               Thời khóa biểu
             </Link>
           </p>
@@ -62,8 +64,9 @@ export default async function ThoiKhoaBieuDetailPage({
           <input type="hidden" name="id" value={tkb.id} />
           <button
             type="submit"
-            className="rounded-md border border-red-200 text-red-600 px-4 py-2 text-sm font-medium hover:bg-red-50"
+            className="inline-flex items-center gap-2 rounded-md border border-red-200 text-red-600 px-4 py-2 text-sm font-medium hover:bg-red-50"
           >
+            <Trash2 className="h-4 w-4" strokeWidth={1.75} />
             Xóa
           </button>
         </form>
@@ -80,7 +83,10 @@ export default async function ThoiKhoaBieuDetailPage({
             </p>
             {[...lopData.theoKhoi.entries()].map(([tietBlock, hang]) => (
               <div key={tietBlock} className="text-sm">
-                <p className="text-slate-500 font-medium">Tiết {tietBlock}</p>
+                <p className="flex items-center gap-1.5 text-slate-500 font-medium">
+                  <Clock3 className="h-3.5 w-3.5" strokeWidth={2} />
+                  Tiết {tietBlock}
+                </p>
                 <ul className="mt-1 divide-y divide-slate-100">
                   {hang
                     .sort((a, b) => a.thu - b.thu)

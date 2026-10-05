@@ -12,6 +12,19 @@ import {
   moLaiGiaoAn,
   xoaGiaoAn,
 } from "@/lib/actions/giao-an";
+import {
+  ChevronLeft,
+  FileDown,
+  Sparkles,
+  Unlock,
+  CheckCircle2,
+  PencilLine,
+  Trash2,
+  Save,
+  Plus,
+  ClipboardCheck,
+  BookOpen,
+} from "lucide-react";
 
 export const maxDuration = 60;
 
@@ -44,7 +57,11 @@ export default async function GiaoAnDetailPage(
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-sm text-slate-500">
-            <Link href={`/lich-trinh/${giaoAn.buoiDay.lichTrinhId}`} className="hover:underline">
+            <Link
+              href={`/lich-trinh/${giaoAn.buoiDay.lichTrinhId}`}
+              className="inline-flex items-center gap-1 hover:underline"
+            >
+              <ChevronLeft className="h-3.5 w-3.5" strokeWidth={2} />
               {giaoAn.buoiDay.lichTrinh.monHoc.tenMonHoc} · {giaoAn.buoiDay.lichTrinh.lop.tenLop}
             </Link>
           </p>
@@ -60,16 +77,22 @@ export default async function GiaoAnDetailPage(
         </div>
         <div className="flex items-center gap-2">
           <span
-            className={`text-xs font-medium px-2.5 py-1 rounded-full ${
+            className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full ${
               daHoanThien ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
             }`}
           >
+            {daHoanThien ? (
+              <CheckCircle2 className="h-3.5 w-3.5" strokeWidth={2} />
+            ) : (
+              <PencilLine className="h-3.5 w-3.5" strokeWidth={2} />
+            )}
             {daHoanThien ? "Hoàn thiện" : "Nháp"}
           </span>
           <a
             href={`/giao-an/${giaoAn.id}/xuat`}
-            className="text-sm rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-50"
+            className="inline-flex items-center gap-1.5 text-sm rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-50"
           >
+            <FileDown className="h-4 w-4" strokeWidth={1.75} />
             Xuất Word
           </a>
         </div>
@@ -80,7 +103,8 @@ export default async function GiaoAnDetailPage(
           <form action={soanLaiBangAI}>
             <input type="hidden" name="id" value={giaoAn.id} />
             <input type="hidden" name="buoiDayId" value={giaoAn.buoiDayId} />
-            <button className="text-sm rounded-md bg-blue-600 text-white px-3 py-1.5 hover:bg-blue-500">
+            <button className="inline-flex items-center gap-1.5 text-sm rounded-md bg-blue-600 text-white px-3 py-1.5 hover:bg-blue-500">
+              <Sparkles className="h-4 w-4" strokeWidth={1.75} />
               Soạn lại bằng AI
             </button>
           </form>
@@ -88,14 +112,16 @@ export default async function GiaoAnDetailPage(
         {daHoanThien ? (
           <form action={moLaiGiaoAn}>
             <input type="hidden" name="id" value={giaoAn.id} />
-            <button className="text-sm rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-50">
+            <button className="inline-flex items-center gap-1.5 text-sm rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-50">
+              <Unlock className="h-4 w-4" strokeWidth={1.75} />
               Mở lại để sửa
             </button>
           </form>
         ) : (
           <form action={hoanThienGiaoAn}>
             <input type="hidden" name="id" value={giaoAn.id} />
-            <button className="text-sm rounded-md bg-emerald-600 text-white px-3 py-1.5 hover:bg-emerald-500">
+            <button className="inline-flex items-center gap-1.5 text-sm rounded-md bg-emerald-600 text-white px-3 py-1.5 hover:bg-emerald-500">
+              <CheckCircle2 className="h-4 w-4" strokeWidth={1.75} />
               Đánh dấu hoàn thiện
             </button>
           </form>
@@ -103,13 +129,17 @@ export default async function GiaoAnDetailPage(
         {!daHoanThien && (
           <form action={xoaGiaoAn}>
             <input type="hidden" name="id" value={giaoAn.id} />
-            <button className="text-sm text-red-600 hover:underline">Xóa giáo án</button>
+            <button className="inline-flex items-center gap-1.5 text-sm text-red-600 hover:underline">
+              <Trash2 className="h-4 w-4" strokeWidth={1.75} />
+              Xóa giáo án
+            </button>
           </form>
         )}
       </div>
 
       <details className="bg-white border border-slate-200 rounded-lg p-5" open>
-        <summary className="cursor-pointer text-sm font-semibold text-slate-800">
+        <summary className="flex items-center gap-1.5 cursor-pointer text-sm font-semibold text-slate-800">
+          <ClipboardCheck className="h-4 w-4 text-slate-500" strokeWidth={1.75} />
           Mục tiêu, đồ dùng thiết bị, hình thức tổ chức
         </summary>
         <form action={capNhatThongTinChung} className="mt-4 space-y-4">
@@ -180,7 +210,8 @@ export default async function GiaoAnDetailPage(
                 className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
               />
             </div>
-            <button className="text-sm rounded-md bg-slate-100 text-slate-700 px-3 py-1.5 hover:bg-slate-200">
+            <button className="inline-flex items-center gap-1.5 text-sm rounded-md bg-slate-100 text-slate-700 px-3 py-1.5 hover:bg-slate-200">
+              <Save className="h-4 w-4" strokeWidth={1.75} />
               Lưu
             </button>
           </fieldset>
@@ -188,7 +219,10 @@ export default async function GiaoAnDetailPage(
       </details>
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">I. Ổn định lớp học</h2>
+        <h2 className="flex items-center gap-2 text-lg font-semibold">
+          <ClipboardCheck className="h-5 w-5 text-slate-500" strokeWidth={1.75} />
+          I. Ổn định lớp học
+        </h2>
         <p className="text-sm text-slate-500 bg-white border border-slate-200 rounded-lg p-4">
           Thời gian: 01 phút — Kiểm tra sĩ số học sinh, ổn định tổ chức cho
           buổi học.
@@ -196,7 +230,10 @@ export default async function GiaoAnDetailPage(
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">II. Thực hiện bài học</h2>
+        <h2 className="flex items-center gap-2 text-lg font-semibold">
+          <BookOpen className="h-5 w-5 text-slate-500" strokeWidth={1.75} />
+          II. Thực hiện bài học
+        </h2>
 
         {noiDung.khungMuc.map((khung, khungIndex) => (
           <KhungMucBlock
@@ -283,14 +320,16 @@ function KhungMucBlock({
               />
             </div>
             <div className="flex justify-between">
-              <button className="text-xs rounded-md bg-slate-100 text-slate-700 px-2.5 py-1.5 hover:bg-slate-200">
+              <button className="inline-flex items-center gap-1 text-xs rounded-md bg-slate-100 text-slate-700 px-2.5 py-1.5 hover:bg-slate-200">
+                <Save className="h-3.5 w-3.5" strokeWidth={1.75} />
                 Lưu
               </button>
               {items.length > 1 && (
                 <button
                   formAction={xoaMuc}
-                  className="text-xs text-red-600 hover:underline"
+                  className="inline-flex items-center gap-1 text-xs text-red-600 hover:underline"
                 >
+                  <Trash2 className="h-3.5 w-3.5" strokeWidth={1.75} />
                   Xóa mục
                 </button>
               )}
@@ -302,8 +341,9 @@ function KhungMucBlock({
         <form action={themMuc}>
           <input type="hidden" name="id" value={giaoAnId} />
           <input type="hidden" name="khungIndex" value={khungIndex} />
-          <button className="text-xs rounded-md bg-slate-900 text-white px-3 py-1.5 hover:bg-slate-700">
-            + Thêm mục
+          <button className="inline-flex items-center gap-1 text-xs rounded-md bg-slate-900 text-white px-3 py-1.5 hover:bg-slate-700">
+            <Plus className="h-3.5 w-3.5" strokeWidth={2.25} />
+            Thêm mục
           </button>
         </form>
       )}

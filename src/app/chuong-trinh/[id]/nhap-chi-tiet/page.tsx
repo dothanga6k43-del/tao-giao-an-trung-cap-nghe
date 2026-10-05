@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import NhapChiTietChuongTrinhForm from "@/components/NhapChiTietChuongTrinhForm";
+import { ChevronLeft } from "lucide-react";
 
 export const maxDuration = 60;
 
@@ -20,7 +21,11 @@ export default async function NhapChiTietPage(
     <div className="space-y-6 max-w-3xl">
       <div>
         <p className="text-sm text-slate-500">
-          <Link href={`/chuong-trinh/${mon.id}`} className="hover:underline">
+          <Link
+            href={`/chuong-trinh/${mon.id}`}
+            className="inline-flex items-center gap-1 hover:underline"
+          >
+            <ChevronLeft className="h-3.5 w-3.5" strokeWidth={2} />
             {mon.tenMonHoc}
           </Link>
         </p>
