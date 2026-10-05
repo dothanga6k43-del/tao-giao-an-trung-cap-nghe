@@ -1,22 +1,43 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { taoGiaoVien, xoaGiaoVien } from "@/lib/actions/giao-vien";
-import { GraduationCap, Plus, Trash2 } from "lucide-react";
+import { GraduationCap, Plus, Trash2, FileSpreadsheet, CheckCircle2 } from "lucide-react";
 
-export default async function GiaoVienPage() {
+export default async function GiaoVienPage(props: PageProps<"/giao-vien">) {
+  const searchParams = await props.searchParams;
+  const daThem = typeof searchParams.daThem === "string" ? Number(searchParams.daThem) : null;
+  const boQua = typeof searchParams.boQua === "string" ? Number(searchParams.boQua) : 0;
+
   const danhSach = await prisma.giaoVien.findMany({
     orderBy: { hoTen: "asc" },
   });
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="flex items-center gap-2.5 text-2xl font-semibold">
-          <GraduationCap className="h-6 w-6 text-slate-500" strokeWidth={1.75} />
-          Giáo viên
-        </h1>
-        <p className="text-slate-500 mt-1 text-sm">
-          Danh sách giáo viên dùng để gán vào môn học và lịch trình giảng dạy.
-        </p>
+      {daThem !== null && (
+        <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-lg p-4 text-sm text-emerald-800">
+          <CheckCircle2 className="h-4.5 w-4.5 shrink-0" strokeWidth={1.75} />
+          Đã thêm {daThem} giáo viên từ file Excel
+          {boQua > 0 ? ` (bỏ qua ${boQua} giáo viên trùng tên đã có)` : ""}.
+        </div>
+      )}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="flex items-center gap-2.5 text-2xl font-semibold">
+            <GraduationCap className="h-6 w-6 text-slate-500" strokeWidth={1.75} />
+            Giáo viên
+          </h1>
+          <p className="text-slate-500 mt-1 text-sm">
+            Danh sách giáo viên dùng để gán vào môn học và lịch trình giảng dạy.
+          </p>
+        </div>
+        <Link
+          href="/giao-vien/nhap-excel"
+          className="inline-flex items-center gap-2 self-start rounded-md border border-slate-300 text-slate-700 px-3 py-1.5 text-sm font-medium hover:bg-slate-50"
+        >
+          <FileSpreadsheet className="h-4 w-4" strokeWidth={1.75} />
+          Nhập từ Excel
+        </Link>
       </div>
 
       <form
