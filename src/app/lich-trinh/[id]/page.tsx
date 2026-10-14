@@ -16,6 +16,8 @@ import { ganGiaoVienChoLichTrinh } from "@/lib/actions/gan-giao-vien";
 import { layTaiKhoanHienTai } from "@/lib/auth/session";
 import { yeuCauQuyenXem } from "@/lib/auth/pham-vi";
 import GanGiaoVienInline from "@/components/GanGiaoVienInline";
+import IconBadge from "@/components/IconBadge";
+import { MAU_LICH_TRINH } from "@/lib/section-colors";
 import {
   ChevronLeft,
   Trash2,
@@ -97,7 +99,8 @@ export default async function LichTrinhDetailPage(
               Lịch trình giảng dạy
             </Link>
           </p>
-          <h1 className="text-2xl font-semibold mt-1">
+          <h1 className="flex items-center gap-3 text-2xl font-semibold mt-1">
+            <IconBadge icon={ClipboardList} mau={MAU_LICH_TRINH} />
             {lichTrinh.monHoc.tenMonHoc} · {lichTrinh.lop.tenLop}
           </h1>
           <p className="text-sm text-slate-500 mt-1">

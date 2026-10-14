@@ -7,6 +7,8 @@ import { ganGiaoVienChoMonHoc } from "@/lib/actions/gan-giao-vien";
 import { layTaiKhoanHienTai } from "@/lib/auth/session";
 import { yeuCauQuyenXem } from "@/lib/auth/pham-vi";
 import GanGiaoVienInline from "@/components/GanGiaoVienInline";
+import IconBadge from "@/components/IconBadge";
+import { MAU_CHUONG_TRINH } from "@/lib/section-colors";
 import {
   ChevronLeft,
   Trash2,
@@ -16,6 +18,7 @@ import {
   ListChecks,
   FileUp,
   Plus,
+  BookOpenText,
 } from "lucide-react";
 
 export default async function MonHocDetailPage(props: PageProps<"/chuong-trinh/[id]">) {
@@ -65,7 +68,8 @@ export default async function MonHocDetailPage(props: PageProps<"/chuong-trinh/[
             </Link>{" "}
             / {mon.tenMonHoc}
           </p>
-          <h1 className="text-2xl font-semibold mt-1">
+          <h1 className="flex items-center gap-3 text-2xl font-semibold mt-1">
+            <IconBadge icon={BookOpenText} mau={MAU_CHUONG_TRINH} />
             {mon.tenMonHoc}
             {mon.maMonHoc ? (
               <span className="text-slate-400 font-normal"> · {mon.maMonHoc}</span>
@@ -319,7 +323,7 @@ export default async function MonHocDetailPage(props: PageProps<"/chuong-trinh/[
             </div>
             <button
               type="submit"
-              className="inline-flex items-center gap-2 rounded-md bg-slate-900 text-white px-4 py-2 text-sm font-medium hover:bg-slate-700"
+              className="inline-flex items-center gap-2 rounded-md bg-indigo-600 text-white px-4 py-2 text-sm font-medium hover:bg-indigo-700"
             >
               <Plus className="h-4 w-4" strokeWidth={2.25} />
               Thêm bài và soạn nội dung chi tiết

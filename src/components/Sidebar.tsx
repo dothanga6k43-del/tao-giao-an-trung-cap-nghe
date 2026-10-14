@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { dangXuat } from "@/lib/actions/dang-nhap";
 import type { TaiKhoanHienTai } from "@/lib/auth/session";
+import IconBadge from "@/components/IconBadge";
 import {
   BookOpenText,
   Users,
@@ -15,17 +16,26 @@ import {
   KeyRound,
   Menu,
   X,
-  LayoutGrid,
+  Sparkles,
   LogOut,
 } from "lucide-react";
+import {
+  MAU_CHUONG_TRINH,
+  MAU_LOP,
+  MAU_GIAO_VIEN,
+  MAU_THOI_KHOA_BIEU,
+  MAU_LICH_TRINH,
+  MAU_GIAO_AN,
+  MAU_TAI_KHOAN,
+} from "@/lib/section-colors";
 
 const NAV_ITEMS = [
-  { href: "/chuong-trinh", label: "Chương trình môn học", icon: BookOpenText },
-  { href: "/lop", label: "Lớp học", icon: Users },
-  { href: "/giao-vien", label: "Giáo viên", icon: GraduationCap },
-  { href: "/thoi-khoa-bieu", label: "Thời khóa biểu", icon: CalendarDays },
-  { href: "/lich-trinh", label: "Lịch trình giảng dạy", icon: ClipboardList },
-  { href: "/giao-an", label: "Giáo án", icon: FileText },
+  { href: "/chuong-trinh", label: "Chương trình môn học", icon: BookOpenText, mau: MAU_CHUONG_TRINH },
+  { href: "/lop", label: "Lớp học", icon: Users, mau: MAU_LOP },
+  { href: "/giao-vien", label: "Giáo viên", icon: GraduationCap, mau: MAU_GIAO_VIEN },
+  { href: "/thoi-khoa-bieu", label: "Thời khóa biểu", icon: CalendarDays, mau: MAU_THOI_KHOA_BIEU },
+  { href: "/lich-trinh", label: "Lịch trình giảng dạy", icon: ClipboardList, mau: MAU_LICH_TRINH },
+  { href: "/giao-an", label: "Giáo án", icon: FileText, mau: MAU_GIAO_AN },
 ];
 
 const DUONG_DAN_AN_SIDEBAR = ["/dang-nhap", "/thiet-lap-admin"];
@@ -39,7 +49,7 @@ export default function Sidebar({ taiKhoan }: { taiKhoan: TaiKhoanHienTai | null
   }
 
   const navItems = taiKhoan?.vaiTro === "ADMIN"
-    ? [...NAV_ITEMS, { href: "/tai-khoan", label: "Tài khoản", icon: KeyRound }]
+    ? [...NAV_ITEMS, { href: "/tai-khoan", label: "Tài khoản", icon: KeyRound, mau: MAU_TAI_KHOAN }]
     : NAV_ITEMS;
 
   return (
@@ -50,7 +60,9 @@ export default function Sidebar({ taiKhoan }: { taiKhoan: TaiKhoanHienTai | null
           className="flex items-center gap-2 font-semibold text-slate-900"
           onClick={() => setOpen(false)}
         >
-          <LayoutGrid className="h-5 w-5 text-slate-700" strokeWidth={2} />
+          <span className="inline-flex items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 p-1.5">
+            <Sparkles className="h-4 w-4 text-white" strokeWidth={2} />
+          </span>
           Soạn giáo án TCN
         </Link>
         <button
@@ -82,7 +94,9 @@ export default function Sidebar({ taiKhoan }: { taiKhoan: TaiKhoanHienTai | null
             className="flex items-center gap-2 font-semibold text-slate-900"
             onClick={() => setOpen(false)}
           >
-            <LayoutGrid className="h-5 w-5 text-slate-700" strokeWidth={2} />
+            <span className="inline-flex items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 p-1.5">
+              <Sparkles className="h-4 w-4 text-white" strokeWidth={2} />
+            </span>
             Soạn giáo án TCN
           </Link>
           <button
@@ -97,19 +111,18 @@ export default function Sidebar({ taiKhoan }: { taiKhoan: TaiKhoanHienTai | null
         <nav className="p-3 space-y-1">
           {navItems.map((item) => {
             const active = pathname === item.href || pathname?.startsWith(`${item.href}/`);
-            const Icon = item.icon;
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className={`flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium ${
+                className={`flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm ${
                   active
-                    ? "bg-slate-900 text-white"
-                    : "text-slate-700 hover:bg-slate-100"
+                    ? `${item.mau.bg} ${item.mau.text} font-semibold`
+                    : "text-slate-600 font-medium hover:bg-slate-50"
                 }`}
               >
-                <Icon className="h-4.5 w-4.5 shrink-0" strokeWidth={2} />
+                <IconBadge icon={item.icon} mau={item.mau} size="sm" />
                 {item.label}
               </Link>
             );

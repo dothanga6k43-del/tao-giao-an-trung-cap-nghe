@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { layTaiKhoanHienTai } from "@/lib/auth/session";
 import { dieuKienTheoGiaoVien } from "@/lib/auth/pham-vi";
 import { FileText, Search, ChevronRight, CheckCircle2, PencilLine } from "lucide-react";
+import IconBadge from "@/components/IconBadge";
+import { MAU_GIAO_AN } from "@/lib/section-colors";
 
 const TRANG_THAI_LABEL: Record<string, string> = {
   DRAFT: "Nháp",
@@ -57,8 +59,8 @@ export default async function GiaoAnListPage(
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="flex items-center gap-2.5 text-2xl font-semibold">
-          <FileText className="h-6 w-6 text-slate-500" strokeWidth={1.75} />
+        <h1 className="flex items-center gap-3 text-2xl font-semibold">
+          <IconBadge icon={FileText} mau={MAU_GIAO_AN} size="lg" />
           Giáo án
         </h1>
         <p className="text-slate-500 mt-1 text-sm">
@@ -73,7 +75,7 @@ export default async function GiaoAnListPage(
           placeholder="Tìm theo tên bài, môn học, lớp..."
           className="flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm"
         />
-        <button className="inline-flex items-center gap-2 rounded-md bg-slate-900 text-white px-4 py-2 text-sm font-medium hover:bg-slate-700">
+        <button className="inline-flex items-center gap-2 rounded-md bg-rose-600 text-white px-4 py-2 text-sm font-medium hover:bg-rose-700">
           <Search className="h-4 w-4" strokeWidth={2} />
           Tìm
         </button>
@@ -82,7 +84,9 @@ export default async function GiaoAnListPage(
       <div className="bg-white border border-slate-200 rounded-lg divide-y divide-slate-100">
         {danhSach.length === 0 && (
           <div className="p-10 text-center">
-            <FileText className="mx-auto h-9 w-9 text-slate-300" strokeWidth={1.5} />
+            <div className="inline-flex">
+              <IconBadge icon={FileText} mau={MAU_GIAO_AN} size="lg" />
+            </div>
             <p className="mt-3 text-sm text-slate-500">Không tìm thấy giáo án nào.</p>
           </div>
         )}
@@ -95,7 +99,7 @@ export default async function GiaoAnListPage(
               className="flex items-center justify-between gap-3 p-4 hover:bg-slate-50"
             >
               <div className="flex items-start gap-3">
-                <FileText className="mt-0.5 h-5 w-5 shrink-0 text-slate-400" strokeWidth={1.75} />
+                <IconBadge icon={FileText} mau={MAU_GIAO_AN} size="sm" />
                 <div>
                   <p className="font-medium text-slate-900">{ga.tenBai}</p>
                   <p className="text-sm text-slate-500">

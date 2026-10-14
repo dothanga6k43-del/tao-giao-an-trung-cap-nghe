@@ -3,6 +3,8 @@ import LichTrinhMoiForm from "@/components/LichTrinhMoiForm";
 import { layTaiKhoanHienTai } from "@/lib/auth/session";
 import { dieuKienTheoGiaoVien } from "@/lib/auth/pham-vi";
 import { ClipboardList } from "lucide-react";
+import IconBadge from "@/components/IconBadge";
+import { MAU_LICH_TRINH } from "@/lib/section-colors";
 
 export default async function LichTrinhMoiPage() {
   const hienTai = await layTaiKhoanHienTai();
@@ -25,8 +27,8 @@ export default async function LichTrinhMoiPage() {
   return (
     <div className="space-y-6 max-w-3xl">
       <div>
-        <h1 className="flex items-center gap-2.5 text-2xl font-semibold">
-          <ClipboardList className="h-6 w-6 text-slate-500" strokeWidth={1.75} />
+        <h1 className="flex items-center gap-3 text-2xl font-semibold">
+          <IconBadge icon={ClipboardList} mau={MAU_LICH_TRINH} size="lg" />
           Tạo lịch trình giảng dạy
         </h1>
         <p className="text-slate-500 mt-1 text-sm">

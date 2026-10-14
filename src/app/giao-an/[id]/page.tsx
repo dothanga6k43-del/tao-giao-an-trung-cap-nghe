@@ -27,7 +27,10 @@ import {
   Plus,
   ClipboardCheck,
   BookOpen,
+  FileText,
 } from "lucide-react";
+import IconBadge from "@/components/IconBadge";
+import { MAU_GIAO_AN } from "@/lib/section-colors";
 
 export const maxDuration = 60;
 
@@ -71,7 +74,10 @@ export default async function GiaoAnDetailPage(
               {giaoAn.buoiDay.lichTrinh.monHoc.tenMonHoc} · {giaoAn.buoiDay.lichTrinh.lop.tenLop}
             </Link>
           </p>
-          <h1 className="text-2xl font-semibold mt-1">{giaoAn.tenBai}</h1>
+          <h1 className="flex items-center gap-3 text-2xl font-semibold mt-1">
+            <IconBadge icon={FileText} mau={MAU_GIAO_AN} />
+            {giaoAn.tenBai}
+          </h1>
           <p className="text-sm text-slate-500 mt-1">
             Buổi {giaoAn.buoiDay.thuTu} · {ngay.toISOString().slice(0, 10)} ·{" "}
             {giaoAn.buoiDay.tongTiet} tiết ({tongPhutBuoi} phút) · Đã soạn:{" "}

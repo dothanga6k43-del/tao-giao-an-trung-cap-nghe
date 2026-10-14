@@ -4,7 +4,9 @@ import { prisma } from "@/lib/prisma";
 import { xoaThoiKhoaBieu } from "@/lib/actions/nhap-thoi-khoa-bieu";
 import { layTaiKhoanHienTai } from "@/lib/auth/session";
 import { yeuCauQuyenXem } from "@/lib/auth/pham-vi";
-import { ChevronLeft, Clock3, Trash2 } from "lucide-react";
+import { ChevronLeft, Clock3, Trash2, CalendarDays } from "lucide-react";
+import IconBadge from "@/components/IconBadge";
+import { MAU_THOI_KHOA_BIEU } from "@/lib/section-colors";
 
 const TEN_THU: Record<number, string> = {
   2: "Thứ 2",
@@ -56,7 +58,10 @@ export default async function ThoiKhoaBieuDetailPage({
               Thời khóa biểu
             </Link>
           </p>
-          <h1 className="text-2xl font-semibold mt-1">{tkb.tieuDe}</h1>
+          <h1 className="flex items-center gap-3 text-2xl font-semibold mt-1">
+            <IconBadge icon={CalendarDays} mau={MAU_THOI_KHOA_BIEU} />
+            {tkb.tieuDe}
+          </h1>
           <p className="text-slate-500 mt-1 text-sm">
             {tkb.tuanThu ? `Tuần ${tkb.tuanThu} · ` : ""}
             {tkb.ngayBatDau && tkb.ngayKetThuc

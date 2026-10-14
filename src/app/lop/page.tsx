@@ -5,6 +5,8 @@ import { ganGiaoVienChoLop } from "@/lib/actions/gan-giao-vien";
 import { layTaiKhoanHienTai } from "@/lib/auth/session";
 import { dieuKienTheoGiaoVien } from "@/lib/auth/pham-vi";
 import GanGiaoVienInline from "@/components/GanGiaoVienInline";
+import IconBadge from "@/components/IconBadge";
+import { MAU_LOP } from "@/lib/section-colors";
 import { Users, Plus, Trash2, FileSpreadsheet, CheckCircle2 } from "lucide-react";
 
 export default async function LopPage(props: PageProps<"/lop">) {
@@ -35,8 +37,8 @@ export default async function LopPage(props: PageProps<"/lop">) {
       )}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="flex items-center gap-2.5 text-2xl font-semibold">
-            <Users className="h-6 w-6 text-slate-500" strokeWidth={1.75} />
+          <h1 className="flex items-center gap-3 text-2xl font-semibold">
+            <IconBadge icon={Users} mau={MAU_LOP} size="lg" />
             Lớp học
           </h1>
           <p className="text-slate-500 mt-1 text-sm">
@@ -91,7 +93,7 @@ export default async function LopPage(props: PageProps<"/lop">) {
         </div>
         <button
           type="submit"
-          className="inline-flex items-center gap-2 rounded-md bg-slate-900 text-white px-4 py-2 text-sm font-medium hover:bg-slate-700"
+          className="inline-flex items-center gap-2 rounded-md bg-emerald-600 text-white px-4 py-2 text-sm font-medium hover:bg-emerald-700"
         >
           <Plus className="h-4 w-4" strokeWidth={2.25} />
           Thêm lớp
@@ -101,14 +103,16 @@ export default async function LopPage(props: PageProps<"/lop">) {
       <div className="bg-white border border-slate-200 rounded-lg divide-y divide-slate-100">
         {danhSach.length === 0 && (
           <div className="p-10 text-center">
-            <Users className="mx-auto h-9 w-9 text-slate-300" strokeWidth={1.5} />
+            <div className="inline-flex">
+              <IconBadge icon={Users} mau={MAU_LOP} size="lg" />
+            </div>
             <p className="mt-3 text-sm text-slate-500">Chưa có lớp nào.</p>
           </div>
         )}
         {danhSach.map((lop) => (
           <div key={lop.id} className="flex items-center justify-between gap-3 p-4">
             <div className="flex items-start gap-3">
-              <Users className="mt-0.5 h-5 w-5 shrink-0 text-slate-400" strokeWidth={1.75} />
+              <IconBadge icon={Users} mau={MAU_LOP} size="sm" />
               <div>
                 <p className="font-medium text-slate-900">{lop.tenLop}</p>
                 <p className="text-sm text-slate-500">

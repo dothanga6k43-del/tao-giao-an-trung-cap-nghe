@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { layTaiKhoanHienTai } from "@/lib/auth/session";
 import { dieuKienTheoGiaoVien } from "@/lib/auth/pham-vi";
 import { ClipboardList, Plus, CheckCircle2, PencilLine } from "lucide-react";
+import IconBadge from "@/components/IconBadge";
+import { MAU_LICH_TRINH } from "@/lib/section-colors";
 
 const TRANG_THAI_LABEL: Record<string, string> = {
   DRAFT: "Nháp",
@@ -26,8 +28,8 @@ export default async function LichTrinhListPage() {
     <div className="space-y-8">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="flex items-center gap-2.5 text-2xl font-semibold">
-            <ClipboardList className="h-6 w-6 text-slate-500" strokeWidth={1.75} />
+          <h1 className="flex items-center gap-3 text-2xl font-semibold">
+            <IconBadge icon={ClipboardList} mau={MAU_LICH_TRINH} size="lg" />
             Lịch trình giảng dạy
           </h1>
           <p className="text-slate-500 mt-1 text-sm">
@@ -37,7 +39,7 @@ export default async function LichTrinhListPage() {
         </div>
         <Link
           href="/lich-trinh/moi"
-          className="inline-flex items-center gap-2 self-start rounded-md bg-slate-900 text-white px-4 py-2 text-sm font-medium hover:bg-slate-700"
+          className="inline-flex items-center gap-2 self-start rounded-md bg-violet-600 text-white px-4 py-2 text-sm font-medium hover:bg-violet-700"
         >
           <Plus className="h-4 w-4" strokeWidth={2.25} />
           Tạo lịch trình
@@ -47,7 +49,9 @@ export default async function LichTrinhListPage() {
       <div className="bg-white border border-slate-200 rounded-lg divide-y divide-slate-100">
         {danhSach.length === 0 && (
           <div className="p-10 text-center">
-            <ClipboardList className="mx-auto h-9 w-9 text-slate-300" strokeWidth={1.5} />
+            <div className="inline-flex">
+              <IconBadge icon={ClipboardList} mau={MAU_LICH_TRINH} size="lg" />
+            </div>
             <p className="mt-3 text-sm text-slate-500">Chưa có lịch trình nào.</p>
           </div>
         )}
@@ -60,7 +64,7 @@ export default async function LichTrinhListPage() {
               className="flex items-center justify-between gap-3 p-4 hover:bg-slate-50"
             >
               <div className="flex items-start gap-3">
-                <ClipboardList className="mt-0.5 h-5 w-5 shrink-0 text-slate-400" strokeWidth={1.75} />
+                <IconBadge icon={ClipboardList} mau={MAU_LICH_TRINH} size="sm" />
                 <div>
                   <p className="font-medium text-slate-900">
                     {lt.monHoc.tenMonHoc} · {lt.lop.tenLop}

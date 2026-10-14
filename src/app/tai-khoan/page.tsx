@@ -5,6 +5,8 @@ import { goiYTenDangNhap } from "@/lib/auth/ten-dang-nhap";
 import TaoTaiKhoanForm from "@/components/TaoTaiKhoanForm";
 import TaiKhoanRow from "@/components/TaiKhoanRow";
 import { KeyRound } from "lucide-react";
+import IconBadge from "@/components/IconBadge";
+import { MAU_TAI_KHOAN } from "@/lib/section-colors";
 
 export default async function TaiKhoanPage() {
   const hienTai = await layTaiKhoanHienTai();
@@ -26,8 +28,8 @@ export default async function TaiKhoanPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="flex items-center gap-2.5 text-2xl font-semibold">
-          <KeyRound className="h-6 w-6 text-slate-500" strokeWidth={1.75} />
+        <h1 className="flex items-center gap-3 text-2xl font-semibold">
+          <IconBadge icon={KeyRound} mau={MAU_TAI_KHOAN} size="lg" />
           Tài khoản
         </h1>
         <p className="text-slate-500 mt-1 text-sm">

@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { taoMonHoc } from "@/lib/actions/chuong-trinh";
 import { layTaiKhoanHienTai } from "@/lib/auth/session";
 import { BookOpenText, Save } from "lucide-react";
+import IconBadge from "@/components/IconBadge";
+import { MAU_CHUONG_TRINH } from "@/lib/section-colors";
 
 export default async function MonHocMoiPage() {
   const hienTai = await layTaiKhoanHienTai();
@@ -13,8 +15,8 @@ export default async function MonHocMoiPage() {
   return (
     <div className="space-y-6 max-w-3xl">
       <div>
-        <h1 className="flex items-center gap-2.5 text-2xl font-semibold">
-          <BookOpenText className="h-6 w-6 text-slate-500" strokeWidth={1.75} />
+        <h1 className="flex items-center gap-3 text-2xl font-semibold">
+          <IconBadge icon={BookOpenText} mau={MAU_CHUONG_TRINH} size="lg" />
           Thêm môn học
         </h1>
         <p className="text-slate-500 mt-1 text-sm">
@@ -196,7 +198,7 @@ export default async function MonHocMoiPage() {
         <div className="flex justify-end">
           <button
             type="submit"
-            className="inline-flex items-center gap-2 rounded-md bg-slate-900 text-white px-5 py-2.5 text-sm font-medium hover:bg-slate-700"
+            className="inline-flex items-center gap-2 rounded-md bg-indigo-600 text-white px-5 py-2.5 text-sm font-medium hover:bg-indigo-700"
           >
             <Save className="h-4 w-4" strokeWidth={1.75} />
             Lưu và tiếp tục thêm bài học
